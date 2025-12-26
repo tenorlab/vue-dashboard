@@ -1,0 +1,65 @@
+{
+  "name": "@tenorlab/vue-dashboard",
+  "version": "1.1.0",
+  "description": "Foundation components for creating user-configurable dashboards in Vue",
+  "author": "Damiano Fusco",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tenorlab/vue-dashboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tenorlab/vue-dashboard/issues"
+  },
+  "homepage": "https://github.com/tenorlab/vue-dashboard#readme",
+  "keywords": [
+    "dashboard, component, libraries, scripts, javascript, react"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "clean": "rm -rf dist node_modules package-lock.json",
+    "build": "npm run pretty; vite build",
+    "pub": "npm run build; npm publish --access public --otp=",
+    "test": "TESTING=true vitest run",
+    "test-watch": "TESTING=true vitest watch",
+    "pretty": "npx prettier --log-level warn --config .prettierrc -w \"./**/*.*{ts,tsx,vue,css}\"",
+    "version-patch": "npm run pretty && npm version patch -m \"Patch version\"",
+    "preversion": "npm run test",
+    "version": "npm run build",
+    "postversion": "git push",
+    "push": "npm run pretty; git add .; git commit -m \"Latest\"; git push"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/vue-dashboard.d.ts",
+      "import": "./dist/vue-dashboard.es.js"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.es.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "types": "./dist/vue-dashboard.d.ts",
+  "main": "./dist/vue-dashboard.es.js",
+  "module": "./dist/vue-dashboard.es.js",
+  "peerDependencies": {
+    "vue": "^3.5.0 || ^3.5.26"
+  },
+  "devDependencies": {
+    "@tenorlab/dashboard-core": "^1.4.1",
+    "@types/node": "^24.10.1",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "@vitejs/plugin-vue-jsx": "^5.1.3",
+    "prettier": "^3.7.4",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.0.16",
+    "vue": "3.5.26",
+    "vue-tsc": "^3.2.1"
+  }
+}
