@@ -22,5 +22,5 @@ export type {
   TWidgetSize,
 } from '@tenorlab/dashboard-core'
 
-// export components and react-specific code
+// export components and vue-specific code
 export * from './components/'

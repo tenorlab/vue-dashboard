@@ -1,6 +1,6 @@
-# @tenorlab/react-dashboard
+# @tenorlab/vue-dashboard
 
-Foundation components for creating user-configurable, high-performance dashboards in React.
+Foundation components for creating user-configurable, high-performance dashboards in Vue.
 
 ---
 
@@ -16,15 +16,15 @@ Foundation components for creating user-configurable, high-performance dashboard
 Install the package via npm or pnpm:
 
 ```bash
-npm install @tenorlab/react-dashboard
+npm install @tenorlab/vue-dashboard
 # or
-pnpm add @tenorlab/react-dashboard
+pnpm add @tenorlab/vue-dashboard
 ```
 
 ## Basic Usage
 Import the styles in your entry tsx file (usually main.tsx):
 ```typescript
-import '@tenorlab/react-dashboard/styles.css'
+import '@tenorlab/vue-dashboard/styles.css'
 ```
 
 TODO:
