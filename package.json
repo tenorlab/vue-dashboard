@@ -1,6 +1,6 @@
 {
   "name": "@tenorlab/vue-dashboard",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Foundation components for creating user-configurable dashboards in Vue",
   "author": "Damiano Fusco",
   "type": "module",
@@ -13,7 +13,7 @@
   },
   "homepage": "https://github.com/tenorlab/vue-dashboard#readme",
   "keywords": [
-    "dashboard, component, libraries, scripts, javascript, react"
+    "dashboard, component, libraries, scripts, javascript, vue"
   ],
   "scripts": {
     "dev": "vite",
