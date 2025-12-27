@@ -2,7 +2,6 @@
 /// <reference types="vite/client" />
 
 import vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx' // This is dedicated to .tsx files
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import path from 'path'
@@ -15,7 +14,6 @@ export default defineConfig({
     vue({
       isProduction: true, // Ensures Vue is built in production mode
     }),
-    vueJsx(), // Enables support for TSX/JSX syntax in .tsx files,
     dts({
       rollupTypes: true,
       bundledPackages: ['@tenorlab/dashboard-core'],
@@ -57,7 +55,6 @@ export default defineConfig({
       name: projectName,
       fileName: (format) => `${projectName}.${format}.js`,
     },
-    minify: 'esbuild',
     rollupOptions: {
       // THIS IS VITAL: The SDK must not contain Vue code
       external: ['vue'],
