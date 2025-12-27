@@ -52,12 +52,12 @@ export default defineConfig({
     },
     rollupOptions: {
       // THIS IS VITAL: The SDK must not contain Vue code
-      external: ['vue', 'zustand'],
+      external: ['vue'],
       output: {
         // Provide global variables to use in the UMD build
         // Add external deps here
         globals: {
-          vue: 'vue',
+          vue: 'Vue',
         },
         // This ensures your main file is named vue-dashboard.es.js
         // and core is named core.es.js
