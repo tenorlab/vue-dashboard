@@ -12,7 +12,9 @@ const projectName = name.replace('@tenorlab/', '').trim().toLowerCase()
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      isProduction: true, // Ensures Vue is built in production mode
+    }),
     vueJsx(), // Enables support for TSX/JSX syntax in .tsx files,
     dts({
       rollupTypes: true,
@@ -42,7 +44,7 @@ export default defineConfig({
   define: {
     // This is the "Magic Bullet": It tells Vue to skip HMR and Dev checks
     'process.env.NODE_ENV': JSON.stringify('production'),
-    '__VUE_PROD_DEVTOOLS__': 'false',
+    __VUE_PROD_DEVTOOLS__: 'false',
   },
   build: {
     lib: {
