@@ -39,6 +39,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src/'),
     },
   },
+  define: {
+    // This is the "Magic Bullet": It tells Vue to skip HMR and Dev checks
+    'process.env.NODE_ENV': JSON.stringify('production'),
+    '__VUE_PROD_DEVTOOLS__': 'false',
+  },
   build: {
     lib: {
       // Switching to object syntax for multiple outputs
