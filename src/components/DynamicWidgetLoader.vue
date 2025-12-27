@@ -186,7 +186,7 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
       @selectContainer="selectContainer"
     >
       <template v-if="isContainer">
-        <DynamicWidgetLoaderDEV
+        <DynamicWidgetLoader
           v-for="(entry, i) in childWidgetEntries"
           :key="`${entry.widgetKey}_${i}`"
           :index="i"
@@ -242,7 +242,7 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
           @selectContainer="selectContainer"
         >
           <template v-if="isContainer" #default>
-            <DynamicWidgetLoaderDEV
+            <DynamicWidgetLoader
               v-for="(entry, i) in childWidgetEntries"
               :key="`${entry.widgetKey}_${i}`"
               :index="i"
