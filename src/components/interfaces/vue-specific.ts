@@ -1,4 +1,5 @@
-// file: src/dashboard-components/interfaces/vue-specific.ts
+// @tenorlab/vue-dashboard
+// file: src/components/interfaces/vue-specific.ts
 import { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 
 // vue specific

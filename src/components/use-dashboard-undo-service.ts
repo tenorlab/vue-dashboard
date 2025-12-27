@@ -1,3 +1,5 @@
+// @tenorlab/vue-dashboard
+// file: src/components/use-dashboard-undo-service.ts
 import { reactive, computed, readonly } from 'vue'
 import type {
   IDashboardConfig,

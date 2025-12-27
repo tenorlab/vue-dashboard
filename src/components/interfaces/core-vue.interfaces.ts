@@ -1,4 +1,5 @@
-// file: src/dashboard-components/interfaces/core-vue.interfaces.ts
+// @tenorlab/vue-dashboard
+// file: src/components/interfaces/core-vue.interfaces.ts
 import type {
   // TDashboardWidgetKey,
   TWidgetMetaInfoBase,

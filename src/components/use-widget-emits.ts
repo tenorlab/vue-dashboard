@@ -1,3 +1,5 @@
+// @tenorlab/vue-dashboard
+// file: src/components/use-widget-emits.ts
 import type { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 import type { TWidgetEmits } from './interfaces'
 

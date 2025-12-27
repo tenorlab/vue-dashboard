@@ -1,3 +1,5 @@
+// @tenorlab/vue-dashboard
+// file: src/components/dashboard-primitives/icons/index.ts
 export { default as AddIcon } from './AddIcon.vue'
 export { default as DeleteIcon } from './DeleteIcon.vue'
 export { default as EditIcon } from './EditIcon.vue'

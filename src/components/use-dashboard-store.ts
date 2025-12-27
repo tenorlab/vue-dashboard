@@ -1,3 +1,5 @@
+// @tenorlab/vue-dashboard
+// file: src/components/use-dashboard-store.ts
 import { reactive, computed } from 'vue'
 import { blankDashboardConfig, ensureContainersSequence } from '@tenorlab/dashboard-core'
 import type { IDashboardConfig, TDashboardWidgetKey } from '@tenorlab/dashboard-core'
