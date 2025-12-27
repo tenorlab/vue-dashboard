@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // file: src/dashboard-components/DynamicWidgetLoader.vue
-import { defineAsyncComponent, computed } from 'vue'
+import { defineAsyncComponent, computed, shallowRef, watchEffect } from 'vue'
 import { useWidgetEmits } from './use-widget-emits'
 import { parseContainerTitle } from '@tenorlab/dashboard-core'
 // import DashboardWidgetBase from './DashboardWidgetBase.vue'
@@ -52,45 +52,25 @@ const catalogEntry = computed<IDynamicWidgetCatalogEntry | undefined>(() => {
 })
 
 // 2. Resolve the Component to Render
-const WidgetComponent = computed(() => {
+// Use a shallowRef to hold the actual component definition
+const resolvedComponent = shallowRef<any | null>(null)
+
+watchEffect(async () => {
   const entry = catalogEntry.value
-  if (!entry) {
-    return null
-  }
+  if (!entry) return
 
-  // CASE A: Static Component (markRaw is used in catalog, so we just return it)
   if (entry.component) {
-    return entry.component
+    resolvedComponent.value = entry.component
+  } else if (entry.loader) {
+    // If it's remote (starts with http), resolve it manually to avoid AsyncComponent bugs
+    if (entry.loader) {
+      const mod = await entry.loader()
+      resolvedComponent.value = mod.default || mod
+    } else {
+      // Keep local ones as Async for standard lazy loading
+      resolvedComponent.value = defineAsyncComponent(entry.loader)
+    }
   }
-
-  // CASE B: Dynamic Plugin Loader
-  if (entry.loader) {
-    return defineAsyncComponent({
-      loader: entry.loader,
-      // This is for testing loadign with delay:
-      // loader: () =>
-      //   new Promise((resolve) => {
-      //     setTimeout(async () => {
-      //       //@ts-ignore
-      //       resolve(await entry.loader())
-      //     }, 750)
-      //   }),
-      // Optional: Add a loading state component
-      // loadingComponent: MySpinnerComponent,
-      // While the chunk downloads:
-      loadingComponent: {
-        template: '<div class="p-8 text-center text-primary animate-pulse">Loading Widget...</div>',
-      },
-      // If the CDN or local chunk fails to load:
-      errorComponent: {
-        template: '<div class="p-8 text-error">Failed to load plugin.</div>',
-      },
-      delay: 200,
-      timeout: 3000,
-    })
-  }
-
-  return null
 })
 
 // Recursion logic: find children if this is a container
@@ -123,8 +103,8 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
 <template>
   <Suspense>
     <component
-      v-if="WidgetComponent"
-      :is="WidgetComponent"
+      v-if="resolvedComponent"
+      :is="resolvedComponent"
       :index="index"
       :maxIndex="childWidgetEntries.length - 1"
       :widgetKey="widgetKey"
@@ -139,7 +119,7 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
       @selectContainer="selectContainer"
     >
       <template v-if="isContainer">
-        <DynamicWidgetLoader
+        <DynamicWidgetLoaderDEV
           v-for="(entry, i) in childWidgetEntries"
           :key="`${entry.widgetKey}_${i}`"
           :index="i"
@@ -154,11 +134,14 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
       </template>
     </component>
 
-    <div v-else class="flex">
-      <p>
-        Widget not found or loader failed::
-        {{ catalogEntry?.meta?.name || catalogEntry?.title || widgetKey }}
-      </p>
+    <div v-else class="flex flex-col">
+      <span> Widget not found or loader failed: </span>
+      <span>
+        {{ catalogEntry?.meta?.name || catalogEntry?.title }}
+      </span>
+      <span>
+        {{ widgetKey }}
+      </span>
     </div>
     <template #fallback>
       <!-- This fallback will be ignored if the defineAsyncComponent 

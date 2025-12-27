@@ -1,6 +1,6 @@
 {
   "name": "@tenorlab/vue-dashboard",
-  "version": "1.0.8",
+  "version": "1.4.3",
   "description": "Foundation components for creating user-configurable dashboards in Vue",
   "author": "Damiano Fusco",
   "type": "module",
@@ -50,7 +50,7 @@
     "vue": "^3.5.0 || ^3.5.26"
   },
   "devDependencies": {
-    "@tenorlab/dashboard-core": "^1.4.1",
+    "@tenorlab/dashboard-core": "^1.4.2",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.3",
     "prettier": "^3.7.4",
