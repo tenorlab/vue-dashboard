@@ -50,6 +50,7 @@ export default defineConfig({
       name: projectName,
       fileName: (format) => `${projectName}.${format}.js`,
     },
+    minify: 'esbuild',
     rollupOptions: {
       // THIS IS VITAL: The SDK must not contain Vue code
       external: ['vue'],

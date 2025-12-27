@@ -1,6 +1,6 @@
 {
   "name": "@tenorlab/vue-dashboard",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Foundation components for creating user-configurable dashboards in Vue",
   "author": "Damiano Fusco",
   "type": "module",
@@ -18,7 +18,7 @@
   "scripts": {
     "dev": "vite",
     "clean": "rm -rf dist node_modules package-lock.json",
-    "build": "npm run pretty; vite build",
+    "build": "npm run pretty; vite build --mode production",
     "pub": "npm run build; npm publish --access public --otp=",
     "test": "TESTING=true vitest run",
     "test-watch": "TESTING=true vitest watch",
