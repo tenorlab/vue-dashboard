@@ -1,12 +1,6 @@
 <script setup lang="ts">
 // file: src/dashboard-components/DynamicWidgetLoader.vue
-import {
-  defineAsyncComponent,
-  computed,
-  shallowRef,
-  watchEffect,
-  markRaw,
-} from 'vue'
+import { defineAsyncComponent, computed, shallowRef, watchEffect, markRaw } from 'vue'
 import { useWidgetEmits } from './use-widget-emits'
 import { parseContainerTitle } from '@tenorlab/dashboard-core'
 import WidgetErrorWrapper from './WidgetErrorWrapper.vue'

@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import type {
-  TDashboardWidgetKey,
-} from '@tenorlab/dashboard-core'
-import type {
-  IDashboardWidgetProps,
-  TWidgetEmits,
-} from './interfaces'
+import type { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
+import type { IDashboardWidgetProps, TWidgetEmits } from './interfaces'
 import DashboardWidgetBase from './DashboardWidgetBase.vue'
 import { useWidgetEmits } from './use-widget-emits'
 import { computed } from 'vue'
