@@ -1,16 +1,15 @@
 <script setup lang="ts">
 // file: src/dashboard-components/DynamicWidgetLoader.vue
 import {
-  // defineAsyncComponent,
+  defineAsyncComponent,
   computed,
   shallowRef,
   watchEffect,
   markRaw,
-  h,
 } from 'vue'
 import { useWidgetEmits } from './use-widget-emits'
 import { parseContainerTitle } from '@tenorlab/dashboard-core'
-// import DashboardWidgetBase from './DashboardWidgetBase.vue'
+import WidgetErrorWrapper from './WidgetErrorWrapper.vue'
 import type { IChildWidgetConfigEntry, TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 import type {
   TDashboardWidgetCatalog,
@@ -72,14 +71,25 @@ const catalogEntry = computed<IDynamicWidgetCatalogEntry | undefined>(() => {
 // 2. Resolve the Component to Render
 // Use a shallowRef to hold the actual component definition
 const resolvedComponent = shallowRef<any | null>(null)
-const errorInfo = shallowRef<{ message: string; details?: string } | null>(null)
+// 1. Local state for error metadata
+const errorMetadata = shallowRef<any>(null)
+
+// 2. Computed property to merge existing extraProps with error data
+const effectiveExtraProps = computed(() => {
+  if (!errorMetadata.value) return props.extraProps
+
+  return {
+    ...props.extraProps,
+    ...errorMetadata.value,
+  }
+})
 
 watchEffect(async () => {
   const entry = catalogEntry.value
   if (!entry) return
 
   // Reset state
-  errorInfo.value = null
+  errorMetadata.value = null // Reset on every change
 
   // CASE A: Static Component
   if (entry.component) {
@@ -87,56 +97,55 @@ watchEffect(async () => {
     return
   }
 
+  // 1. Check Versions (if meta exists)
+  /* @ts-ignore */
+  // 1. Prepare the payload for the Error Wrapper
+  const hostVer = typeof __HOST_VUE_VERSION__ !== 'undefined' ? __HOST_VUE_VERSION__ : '3.5.26'
+  const externalDependencies = entry.meta?.externalDependencies || []
+  const vueReq = externalDependencies.find((d) => d.startsWith('vue@'))
+
+  if (vueReq) {
+    const requiredVer = vueReq.split('@')[1]
+    if (!isVersionCompatible(hostVer, requiredVer)) {
+      // 2. Update local ref with error info
+      errorMetadata.value = {
+        hostVer,
+        requiredVer: vueReq ? vueReq.split('@')[1] : 'Unknown',
+        externalDependencies,
+        errorMessage: `Incompatible Vue version. Required: ${requiredVer}, Host: ${hostVer}`,
+        versionMismatch: true,
+      }
+
+      resolvedComponent.value = markRaw(WidgetErrorWrapper)
+      return
+    }
+  }
+
   // CASE B: Dynamic Loader
   if (entry.loader) {
     try {
-      // 1. Check Versions (if meta exists)
-      /* @ts-ignore */
-      const hostVer = typeof __HOST_VUE_VERSION__ !== 'undefined' ? __HOST_VUE_VERSION__ : '3.5.0'
-      const externalDeps = entry.meta?.externalDependencies || []
-      const vueReq = externalDeps.find((d) => d.startsWith('vue@'))
-
-      if (vueReq) {
-        const requiredVer = vueReq.split('@')[1]
-        if (!isVersionCompatible(hostVer, requiredVer)) {
-          throw new Error(`Incompatible Vue version. Required: ${requiredVer}, Host: ${hostVer}`)
-        }
-      }
-
       console.log('Loading widget', props.widgetKey, entry.meta)
 
       // 2. Load the Module
-      const mod = await entry.loader()
-      resolvedComponent.value = markRaw(mod.default || mod)
-      //resolvedComponent.value = defineAsyncComponent(entry.loader)
+      if (entry.isRemote) {
+        const mod = await entry.loader()
+        resolvedComponent.value = markRaw(mod.default || mod)
+      } else {
+        resolvedComponent.value = defineAsyncComponent(entry.loader)
+      }
     } catch (err: any) {
       console.error(`Widget Load Error [${props.widgetKey}]:`, err)
 
-      // Create a "Local" error component similar to your React version
-      // We use h() here to create a functional component on the fly
-      resolvedComponent.value = markRaw({
-        name: 'WidgetErrorFallback',
-        render: () =>
-          h(
-            'div',
-            { class: 'p-4 border border-dashed border-error bg-error/10 text-error rounded' },
-            [
-              h('p', { class: 'font-bold' }, `Failed to load "${props.widgetKey}"`),
-              h(
-                'p',
-                { class: 'text-xs italic' },
-                err.message || 'The remote plugin is unavailable.',
-              ),
-              entry.meta
-                ? h(
-                    'pre',
-                    { class: 'text-[10px] mt-2 opacity-70 overflow-auto' },
-                    JSON.stringify(entry.meta, null, 2),
-                  )
-                : null,
-            ],
-          ),
-      })
+      // Update local ref with error info
+      errorMetadata.value = {
+        hostVer,
+        requiredVer: vueReq ? vueReq.split('@')[1] : 'Unknown',
+        externalDependencies,
+        errorMessage: err.message,
+        versionMismatch: false,
+      }
+
+      resolvedComponent.value = markRaw(WidgetErrorWrapper)
     }
   }
 })
@@ -236,7 +245,7 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
           :title="
             isContainer ? parsedContainerTitle : catalogEntry?.meta?.name || catalogEntry?.title
           "
-          :extraProps="extraProps"
+          :extraProps="effectiveExtraProps"
           @removeClick="onRemoveClick"
           @moveClick="onMoveClick"
           @selectContainer="selectContainer"
@@ -251,6 +260,7 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
               :parentWidgetKey="entry.parentWidgetKey"
               :widgetCatalog="widgetCatalog"
               :isEditing="isEditing"
+              :extraProps="extraProps"
               @removeClick="onRemoveClick"
               @moveClick="onMoveClick"
             />
