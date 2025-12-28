@@ -13,13 +13,13 @@ import type { Component as VueComponent } from 'vue'
 
 // framework specific component type and element type
 /**
- * @name TFrameworkComponentType 
+ * @name TFrameworkComponentType
  * @description Represents a Vue component type.
  */
 type TFrameworkComponentType = VueComponent
 
 /**
- * @name TFrameworkElementType 
+ * @name TFrameworkElementType
  * @description Represents a Vue component instance.
  */
 type TFrameworkElementType = VueComponent

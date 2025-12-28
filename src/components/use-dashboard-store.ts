@@ -24,7 +24,7 @@ type TMoveWidgetResponse = TAddWidgetResponse
 /**
  * @name _getNextContainerName
  * @description Generates the next container name based on existing containers in the dashboard configuration
- * @param dashboardConfig 
+ * @param dashboardConfig
  * @returns {string} The next container name in the format 'containerX', where X is the next available number
  */
 const _getNextContainerName = (dashboardConfig: IDashboardConfig) => {
@@ -39,8 +39,8 @@ const _getNextContainerName = (dashboardConfig: IDashboardConfig) => {
 /**
  * @name _getNextContainerKey
  * @description Generates the next container widget key based on the dashboard configuration and a given container widget key
- * @param dashboardConfig 
- * @param containerWidgetKey 
+ * @param dashboardConfig
+ * @param containerWidgetKey
  * @returns {TDashboardWidgetKey} The next container widget key
  */
 const _getNextContainerKey = (
@@ -55,7 +55,7 @@ const _getNextContainerKey = (
 /**
  * @name _addWidget
  * @description Adds a widget to the dashboard configuration, either at the root level or within a specified parent container
- * @param params 
+ * @param params
  * @returns {Omit<TAddWidgetResponse, 'allUpdatedDashboardConfigs'>} The response indicating success or failure and the updated dashboard configuration
  */
 const _addWidget = (params: {
@@ -116,9 +116,9 @@ const _addWidget = (params: {
 /**
  * @name _removeWidget
  * @description Removes a widget from the dashboard configuration, either from the root level or from a specified parent container
- * @param dashboardConfig 
- * @param widgetKey 
- * @param parentWidgetKey 
+ * @param dashboardConfig
+ * @param widgetKey
+ * @param parentWidgetKey
  * @returns {Omit<TRemoveWidgetResponse, 'allUpdatedDashboardConfigs'>} The response indicating success or failure and the updated dashboard configuration
  */
 const _removeWidget = (
@@ -172,10 +172,10 @@ const _removeWidget = (
 /**
  * @name _moveWidget
  * @description Moves a widget within the dashboard configuration, either at the root level or within a specified parent container
- * @param dashboardConfig 
- * @param direction 
- * @param widgetKey 
- * @param parentWidgetKey 
+ * @param dashboardConfig
+ * @param direction
+ * @param widgetKey
+ * @param parentWidgetKey
  * @returns {Omit<TMoveWidgetResponse, 'allUpdatedDashboardConfigs'>} The response indicating success or failure and the updated dashboard configuration
  */
 const _moveWidget = (

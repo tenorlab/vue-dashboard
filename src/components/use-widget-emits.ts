@@ -6,7 +6,7 @@ import type { TWidgetEmits } from './interfaces'
 /**
  * @name useWidgetEmits
  * @description A composable function to handle widget emits in Vue dashboard components.
- * @param emits 
+ * @param emits
  * @returns An object containing methods to emit widget events.
  */
 export function useWidgetEmits(emits: TWidgetEmits): {
