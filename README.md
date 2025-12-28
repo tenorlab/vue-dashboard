@@ -46,4 +46,4 @@ This project is dual-licensed:
 1. **Non-Commercial / Personal Use:** Licensed under the [Polyform Non-Commercial 1.0.0](https://polyformproject.org/licenses/non-commercial/1.0.0/). Free to use for students, hobbyists, and open-source projects.
 2. **Commercial Use:** Requires a **Tenorlab Commercial License**.
 
-If you are using this library to build a product that generates revenue, or within a commercial entity, please visit [tenorlab.com/license](https://tenorlab.com/license) to purchase a commercial seat.
+If you are using this library to build a revenue-generating product or within a commercial entity, please visit [https://payhip.com/b/gPBpo](https://payhip.com/b/gPBpo) to purchase a license.
