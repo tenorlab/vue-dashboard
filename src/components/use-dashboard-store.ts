@@ -4,6 +4,14 @@ import { reactive, computed } from 'vue'
 import { blankDashboardConfig, ensureContainersSequence } from '@tenorlab/dashboard-core'
 import type { IDashboardConfig, TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 
+/**
+ * @name TAddWidgetResponse
+ * @description Type for the response of the addWidget mutation
+ * @property {boolean} success - Indicates if the widget was added successfully
+ * @property {string} [message] - Optional message providing additional information
+ * @property {IDashboardConfig} updatedDashboardConfig - The updated dashboard configuration after adding the widget
+ * @property {IDashboardConfig[]} allUpdatedDashboardConfigs - All updated dashboard configurations
+ */
 type TAddWidgetResponse = {
   success: boolean
   message?: string
@@ -13,6 +21,12 @@ type TAddWidgetResponse = {
 type TRemoveWidgetResponse = TAddWidgetResponse
 type TMoveWidgetResponse = TAddWidgetResponse
 
+/**
+ * @name _getNextContainerName
+ * @description Generates the next container name based on existing containers in the dashboard configuration
+ * @param dashboardConfig 
+ * @returns {string} The next container name in the format 'containerX', where X is the next available number
+ */
 const _getNextContainerName = (dashboardConfig: IDashboardConfig) => {
   // get next container id
   const containersIds = dashboardConfig.widgets
@@ -22,6 +36,13 @@ const _getNextContainerName = (dashboardConfig: IDashboardConfig) => {
   return `container${nextId}`
 }
 
+/**
+ * @name _getNextContainerKey
+ * @description Generates the next container widget key based on the dashboard configuration and a given container widget key
+ * @param dashboardConfig 
+ * @param containerWidgetKey 
+ * @returns {TDashboardWidgetKey} The next container widget key
+ */
 const _getNextContainerKey = (
   dashboardConfig: IDashboardConfig,
   containerWidgetKey: TDashboardWidgetKey,
@@ -31,6 +52,12 @@ const _getNextContainerKey = (
   return widgetKey
 }
 
+/**
+ * @name _addWidget
+ * @description Adds a widget to the dashboard configuration, either at the root level or within a specified parent container
+ * @param params 
+ * @returns {Omit<TAddWidgetResponse, 'allUpdatedDashboardConfigs'>} The response indicating success or failure and the updated dashboard configuration
+ */
 const _addWidget = (params: {
   dashboardConfig: IDashboardConfig
   widgetKey: TDashboardWidgetKey
@@ -86,6 +113,14 @@ const _addWidget = (params: {
   }
 }
 
+/**
+ * @name _removeWidget
+ * @description Removes a widget from the dashboard configuration, either from the root level or from a specified parent container
+ * @param dashboardConfig 
+ * @param widgetKey 
+ * @param parentWidgetKey 
+ * @returns {Omit<TRemoveWidgetResponse, 'allUpdatedDashboardConfigs'>} The response indicating success or failure and the updated dashboard configuration
+ */
 const _removeWidget = (
   dashboardConfig: IDashboardConfig,
   widgetKey: TDashboardWidgetKey,
@@ -134,6 +169,15 @@ const _removeWidget = (
   }
 }
 
+/**
+ * @name _moveWidget
+ * @description Moves a widget within the dashboard configuration, either at the root level or within a specified parent container
+ * @param dashboardConfig 
+ * @param direction 
+ * @param widgetKey 
+ * @param parentWidgetKey 
+ * @returns {Omit<TMoveWidgetResponse, 'allUpdatedDashboardConfigs'>} The response indicating success or failure and the updated dashboard configuration
+ */
 const _moveWidget = (
   dashboardConfig: IDashboardConfig,
   direction: -1 | 1,
@@ -225,6 +269,15 @@ const _moveWidget = (
   }
 }
 
+/**
+ * @name IDashboardState
+ * @description Interface defining the structure of the dashboard store state
+ * @property {boolean} isLoading - Indicates if the dashboard is currently loading
+ * @property {boolean} isEditing - Indicates if the dashboard is in editing mode
+ * @property {IDashboardConfig[]} allDashboardConfigs - List of all dashboard configurations
+ * @property {IDashboardConfig} currentDashboardConfig - The currently selected dashboard configuration
+ * @property {TDashboardWidgetKey | undefined} targetContainerKey - The key of the target container widget, if any
+ */
 interface IDashboardState {
   isLoading: boolean
   isEditing: boolean
@@ -233,6 +286,11 @@ interface IDashboardState {
   targetContainerKey?: TDashboardWidgetKey | undefined
 }
 
+/**
+ * @name getInitialState
+ * @description Returns the initial state of the dashboard store
+ * @returns {IDashboardState} The initial dashboard store state
+ */
 const getInitialState = (): IDashboardState => {
   // TODO: add check for user preferred color scheme:
   // const prefersDark = usePreferredColorScheme().getPreferredScheme() === 'dark'
@@ -247,6 +305,10 @@ const getInitialState = (): IDashboardState => {
 
 const _state = reactive<IDashboardState>(getInitialState())
 
+/**
+ * @name _mutations
+ * @description Object containing mutation methods to modify the dashboard store state
+ */
 const _mutations = {
   setIsLoading: (value: boolean) => (_state.isLoading = value),
   setIsEditing: (value: boolean) => (_state.isEditing = value),
@@ -360,6 +422,10 @@ const _mutations = {
   },
 }
 
+/**
+ * @name _actions
+ * @description Object containing action methods that wrap mutations for the dashboard store
+ */
 const _actions = {
   setIsLoading: (value: boolean): boolean => _mutations.setIsLoading(value),
   setIsEditing: (value: boolean): boolean => {
@@ -398,6 +464,10 @@ const _actions = {
   ) => _mutations.moveWidget(direction, widgetKey, parentWidgetKey),
 }
 
+/**
+ * @name _getters
+ * @description Object containing getter methods to retrieve specific information from the dashboard store state
+ */
 const _getters = {
   getNextContainerKey: (containerWidgetKey: TDashboardWidgetKey): TDashboardWidgetKey =>
     _getNextContainerKey(_state.currentDashboardConfig, containerWidgetKey),
@@ -407,6 +477,10 @@ const _getters = {
   getTargetContainerKey: (): TDashboardWidgetKey | undefined => _state.targetContainerKey,
 }
 
+/**
+ * @name computedGetters
+ * @description Object containing computed properties for the dashboard store state
+ */
 const computedGetters = {
   isLoading: computed(() => _state.isLoading),
   isEditing: computed(() => _state.isEditing),
@@ -436,6 +510,13 @@ const computedGetters = {
 
 type TActions = typeof _actions
 
+/**
+ * @name IDashboardStore
+ * @description Interface defining the structure of the dashboard store
+ * @property {TActions} actions - The actions available in the dashboard store
+ * @property {typeof _getters} getters - The getters available in the dashboard store
+ * @property {typeof computedGetters} computed - The computed properties available in the dashboard store
+ */
 export interface IDashboardStore extends TActions {
   actions: TActions
   getters: typeof _getters
@@ -449,4 +530,9 @@ const _dashboardStore: IDashboardStore = {
   computed: computedGetters,
 }
 
+/**
+ * @name useDashboardStore
+ * @description Hook to access the dashboard store
+ * @returns {IDashboardStore} The dashboard store instance
+ */
 export const useDashboardStore = (): IDashboardStore => _dashboardStore

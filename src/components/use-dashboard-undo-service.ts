@@ -7,6 +7,13 @@ import type {
   TDashboardUndoStatus,
 } from '@tenorlab/dashboard-core'
 
+/**
+ * @name TState
+ * @description Internal state structure for the undo service.
+ * @property currentDashboardId The currently active dashboard ID.
+ * @property undoHistory A record mapping dashboard IDs to their undo history entries.
+ * @property historyIndex A record mapping dashboard IDs to their current history index.
+ */
 type TState = {
   currentDashboardId: string | null
   // History: { 'dashboardId': [entry, entry, ...] }
@@ -32,6 +39,8 @@ const _setHistoryIndex = (dashboardId: string, index: number) => {
 }
 
 /**
+ * @name initializeHistoryForDashboard
+ * @description
  * Initializes history with a starting config (always index 0)
  * and CLEARs any previous history for the given ID.
  * @param initialConfig The configuration to save as the base state (index 0).
@@ -55,7 +64,8 @@ const initializeHistoryForDashboard = (initialConfig: IDashboardConfig) => {
 }
 
 /**
- * Adds a new undo entry, trimming any existing redo history.
+ * @name addUndoEntry
+ * @description Adds a new undo entry, trimming any existing redo history.
  * @param newConfig The latest configuration to save in history.
  */
 const addUndoEntry = (newConfig: IDashboardConfig) => {
@@ -82,6 +92,8 @@ const addUndoEntry = (newConfig: IDashboardConfig) => {
 }
 
 /**
+ * @name removeUndoHistoryForDashboard
+ * @description
  * Removes the entire history for a deleted dashboard.
  */
 const removeUndoHistoryForDashboard = (dashboardId: string) => {
@@ -92,6 +104,8 @@ const removeUndoHistoryForDashboard = (dashboardId: string) => {
 }
 
 /**
+ * @name getPreviousChanges
+ * @description
  * Renamed from `undo`. Moves the history pointer one step back (decrements index).
  * @returns The configuration object at the previous state, or undefined.
  */
@@ -112,6 +126,8 @@ const getPreviousChanges = (dashboardId: string): IDashboardConfig | undefined =
 }
 
 /**
+ * @name getNextChanges
+ * @description
  * Renamed from `redo`. Moves the history pointer one step forward (increments index).
  * @returns The configuration object at the next state, or undefined.
  */
@@ -133,7 +149,13 @@ const getNextChanges = (dashboardId: string): IDashboardConfig | undefined => {
   return undefined // Index didn't change (at end)
 }
 
-// --- get Disabled Status Calculation ---
+/**
+ * @name getUndoStatus
+ * @description
+ * Calculates whether undo and redo actions are disabled
+ * based on the current index and history length.
+ * @returns An object indicating the disabled status of undo and redo.
+ */
 const getUndoStatus = (): TDashboardUndoStatus => {
   const dashboardId = _state.currentDashboardId || ''
   const currentIndex = _getCurrentIndex(dashboardId)
@@ -154,9 +176,20 @@ const getUndoStatus = (): TDashboardUndoStatus => {
   }
 }
 
-// Computed property to calculate status based on the currently active dashboard ID
+/**
+ * @name computedUndoStatus
+ * @description
+ * A Vue computed property that provides the current undo/redo status
+ * for the active dashboard.
+ */
 const computedUndoStatus = computed<TDashboardUndoStatus>(() => getUndoStatus())
 
+/**
+ * @name useDashboardUndoService
+ * @description
+ * A composable function that provides access to the dashboard undo service.
+ * @returns An object containing methods and computed properties for undo/redo functionality.
+ */
 export const useDashboardUndoService = () => {
   return {
     initializeHistoryForDashboard,

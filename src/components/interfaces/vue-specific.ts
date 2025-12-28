@@ -3,6 +3,11 @@
 import { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 
 // vue specific
+/**
+ * @name TWidgetEmits
+ * @description Defines the event emits for Vue dashboard widgets.
+ * @interface TWidgetEmits
+ */
 export type TWidgetEmits = {
   (
     event: 'removeClick',
