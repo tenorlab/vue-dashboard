@@ -66,7 +66,7 @@ export default defineConfig({
           return chunkInfo.name === 'vue-dashboard' ? 'vue-dashboard.es.js' : '[name].es.js'
         },
         // If shared code is split out, name it something recognizable
-        chunkFileNames: 'chunks/[name]-[hash].js',
+        chunkFileNames: 'chunks/[name].js',
         assetFileNames: (assetInfo) => {
           const name = assetInfo.names?.[0] ?? assetInfo.name
           if (name && name.endsWith('.css')) {
