@@ -230,7 +230,7 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
         <component
           :is="resolvedComponent"
           :index="index"
-          :maxIndex="childWidgetEntries.length - 1"
+          :maxIndex="maxIndex"
           :widgetKey="widgetKey"
           :parentWidgetKey="parentWidgetKey"
           :widgetCatalog="widgetCatalog"
