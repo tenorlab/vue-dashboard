@@ -48,6 +48,11 @@ export const localWidgetDiscovery = (
   widgetMetaModules: Record<string, any>,
   lazy: boolean = true,
 ): [string, IDynamicWidgetCatalogEntryBase][] => {
+  if (lazy) {
+    // In lazy mode, we don't need to modify the components, as they are loaded dynamically
+    return _localWidgetDiscovery(baseSrcPath, widgetModules, widgetMetaModules, lazy)
+  }
+  // In non-lazy mode,
   // We use markRaw here to prevent Vue from making the component definition reactive,
   // which is crucial for performance and preventing internal Vue warnings.
   const staticEntries = _localWidgetDiscovery(baseSrcPath, widgetModules, widgetMetaModules, lazy)
