@@ -50,7 +50,7 @@ export const localWidgetDiscovery = (
 ): [string, IDynamicWidgetCatalogEntryBase][] => {
   // We use markRaw here to prevent Vue from making the component definition reactive,
   // which is crucial for performance and preventing internal Vue warnings.
-  const staticEntries = localWidgetDiscovery(baseSrcPath, widgetModules, widgetMetaModules, lazy)
+  const staticEntries = _localWidgetDiscovery(baseSrcPath, widgetModules, widgetMetaModules, lazy)
   // map through our local createStaticEntry helper to ensure components are marked raw
   return staticEntries.map((x) =>
     _createStaticEntry(x[0], markRaw((x[1] as any).component), (x[1] as any).meta),
