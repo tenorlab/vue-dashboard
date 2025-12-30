@@ -47,7 +47,7 @@
   "main": "./dist/vue-dashboard.es.js",
   "module": "./dist/vue-dashboard.es.js",
   "devDependencies": {
-    "@tenorlab/dashboard-core": "^1.5.1",
+    "@tenorlab/dashboard-core": "^1.5.2",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.3",
     "prettier": "^3.7.4",
