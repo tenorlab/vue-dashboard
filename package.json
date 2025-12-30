@@ -1,6 +1,6 @@
 {
   "name": "@tenorlab/vue-dashboard",
-  "version": "1.5.2",
+  "version": "1.5.21",
   "description": "Foundation components for creating user-configurable dashboards in Vue",
   "author": "Damiano Fusco",
   "type": "module",

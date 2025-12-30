@@ -226,41 +226,40 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
 <template>
   <Suspense>
     <template #default>
-      <div v-if="resolvedComponent">
-        <component
-          :is="resolvedComponent"
-          :index="index"
-          :maxIndex="maxIndex"
-          :widgetKey="widgetKey"
-          :parentWidgetKey="parentWidgetKey"
-          :widgetCatalog="widgetCatalog"
-          :isEditing="isEditing"
-          :highlight="(isContainer && targetContainerKey === widgetKey) || false"
-          :title="
-            isContainer ? parsedContainerTitle : catalogEntry?.meta?.name || catalogEntry?.title
-          "
-          :extraProps="effectiveExtraProps"
-          @removeClick="onRemoveClick"
-          @moveClick="onMoveClick"
-          @selectContainer="selectContainer"
-        >
-          <template v-if="isContainer" #default>
-            <DynamicWidgetLoader
-              v-for="(entry, i) in childWidgetEntries"
-              :key="`${entry.widgetKey}_${i}`"
-              :index="i"
-              :maxIndex="childWidgetEntries.length - 1"
-              :widgetKey="entry.widgetKey"
-              :parentWidgetKey="entry.parentWidgetKey"
-              :widgetCatalog="widgetCatalog"
-              :isEditing="isEditing"
-              :extraProps="extraProps"
-              @removeClick="onRemoveClick"
-              @moveClick="onMoveClick"
-            />
-          </template>
-        </component>
-      </div>
+      <component
+        v-if="resolvedComponent"
+        :is="resolvedComponent"
+        :index="index"
+        :maxIndex="maxIndex"
+        :widgetKey="widgetKey"
+        :parentWidgetKey="parentWidgetKey"
+        :widgetCatalog="widgetCatalog"
+        :isEditing="isEditing"
+        :highlight="(isContainer && targetContainerKey === widgetKey) || false"
+        :title="
+          isContainer ? parsedContainerTitle : catalogEntry?.meta?.name || catalogEntry?.title
+        "
+        :extraProps="effectiveExtraProps"
+        @removeClick="onRemoveClick"
+        @moveClick="onMoveClick"
+        @selectContainer="selectContainer"
+      >
+        <template v-if="isContainer" #default>
+          <DynamicWidgetLoader
+            v-for="(entry, i) in childWidgetEntries"
+            :key="`${entry.widgetKey}_${i}`"
+            :index="i"
+            :maxIndex="childWidgetEntries.length - 1"
+            :widgetKey="entry.widgetKey"
+            :parentWidgetKey="entry.parentWidgetKey"
+            :widgetCatalog="widgetCatalog"
+            :isEditing="isEditing"
+            :extraProps="extraProps"
+            @removeClick="onRemoveClick"
+            @moveClick="onMoveClick"
+          />
+        </template>
+      </component>
 
       <div v-else class="flex items-center justify-center p-8 border border-dashed border-base-300">
         <p class="text-sm animate-pulse">Initializing {{ widgetKey }}...</p>
