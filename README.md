@@ -135,9 +135,9 @@ import {
   TWidgetFactory,
 } from '@tenorlab/vue-dashboard'
 import {
-  createStaticEntry as _createStaticEntry,
+  createStaticEntry,
   localWidgetDiscovery,
-  remoteWidgetDiscovery as _remoteWidgetDiscovery,
+  remoteWidgetDiscovery,
 } from '@tenorlab/vue-dashboard/core'
 
 import WidgetRecentPaymentInfo from './other-widgets/WidgetRecentPaymentInfo.vue'
@@ -145,9 +145,6 @@ import WidgetRecentPaymentInfo from './other-widgets/WidgetRecentPaymentInfo.vue
 
 const bundledWidgetsSrcPath = '/src/bundled-widgets'
 const asyncWidgetsSrcPath = '/src/async-widgets'
-
-import { markRaw } from 'vue'
-import type { Component as VueComponent } from 'vue'
 
 // Use Vite's Glob Import
 // This creates an object where the keys are file paths, and the values are the TWidgetFactory functions.
@@ -168,18 +165,6 @@ const allMetaModules = import.meta.glob('/src/**/widget-*/meta.ts', {
 }) as Record<string, Record<string, TWidgetMetaInfoBase>>
 
 const hasPermission = (_user: any, _permission: string) => true
-
-/**
- * @name createStaticEntry
- * Wraps around createStaticEntry from npm package to ensure the component added is marked raw (using markRaw)
- */
-export const createStaticEntry = (
-  key: string,
-  component: VueComponent,
-  metaData?: TWidgetMetaInfoBase,
-): [string, IDynamicWidgetCatalogEntry] => {
-  return _createStaticEntry(key, markRaw(component), metaData)
-}
 
 /**
  * @name getWidgetCatalog
