@@ -57,32 +57,16 @@ export default defineConfig({
     },
     rollupOptions: {
       // THIS IS VITAL: The SDK must not contain Vue code
-      external: ['vue', '@tenorlab/dashboard-core'],
+      external: ['vue'],
       output: {
-        // // This ensures your main file is named vue-dashboard.es.js
-        // // and core is named core.es.js
-        // entryFileNames: (chunkInfo) => {
-        //   // Matches the key in your lib.entry object
-        //   return chunkInfo.name === 'vue-dashboard' ? 'vue-dashboard.es.js' : '[name].es.js'
-        // },
-        // // If shared code is split out, name it something recognizable
-        // chunkFileNames: 'chunks/[name].js',
-        // assetFileNames: (assetInfo) => {
-        //   const name = assetInfo.names?.[0] ?? assetInfo.name
-        //   if (name && name.endsWith('.css')) {
-        //     return 'styles.css'
-        //   }
-        //   return '[name][extname]'
-        // },
-
-        // Ensure NO chunks are created.
-        // This forces everything into the entry files.
         manualChunks: undefined,
         preserveModules: false,
+        // This ensures your main file is named vue-dashboard.es.js
+        // and core is named core.es.js
         entryFileNames: (chunkInfo) => {
+          // Matches the key in your lib.entry object
           return chunkInfo.name === 'vue-dashboard' ? 'vue-dashboard.es.js' : '[name].es.js'
         },
-        // 3. THE MAGIC BIT:
         // This tells Rollup: "When you see an import for @tenorlab/dashboard-core,
         // rewrite the path to @tenorlab/vue-dashboard/core in the final JS."
         paths: {
