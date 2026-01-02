@@ -36,6 +36,7 @@ export type TWidgetsCatalogFlyoutProps = {
   widgetsCatalog: TDashboardWidgetCatalog
   currentDashboardConfig: IDashboardConfig
   undoStatus: TDashboardUndoStatus
+  zIndex?: number
   addWidget: (widgetKey: TDashboardWidgetKey, parentWidgetKey?: TDashboardWidgetKey) => any
   addContainer: (widgetKey: TDashboardWidgetKey) => any
   onSettingItemsUpdated: (items: IDashboardSettingEntry[]) => any
@@ -181,6 +182,7 @@ watch(
   <DraggablePanel
     testId="dashboard-catalog-flyout"
     className="bg-body content-body bg-opacity-70 border-2 border-primary"
+    :zIndex="zIndex"
     :style="{
       width: '360px',
       minWidth: '360px',

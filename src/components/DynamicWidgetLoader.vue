@@ -9,6 +9,7 @@ import type {
   TDashboardWidgetCatalog,
   TWidgetEmits,
   IDynamicWidgetCatalogEntry,
+  TWidgetErrorExtraProps,
 } from './interfaces'
 
 // Add this helper function at the top of your script setup or in a shared utils file
@@ -66,7 +67,7 @@ const catalogEntry = computed<IDynamicWidgetCatalogEntry | undefined>(() => {
 // Use a shallowRef to hold the actual component definition
 const resolvedComponent = shallowRef<any | null>(null)
 // 1. Local state for error metadata
-const errorMetadata = shallowRef<any>(null)
+const errorMetadata = shallowRef<TWidgetErrorExtraProps | null>(null)
 
 // 2. Computed property to merge existing extraProps with error data
 const effectiveExtraProps = computed(() => {
@@ -91,9 +92,10 @@ watchEffect(async () => {
     return
   }
 
-  // 1. Check Versions (if meta exists)
+  // --- VERSION CHECK LOGIC ---
+  // 1. Get host version from the injected define
+  // prettier-ignore
   /* @ts-ignore */
-  // 1. Prepare the payload for the Error Wrapper
   const hostVer = typeof __HOST_VUE_VERSION__ !== 'undefined' ? __HOST_VUE_VERSION__ : '3.5.26'
   const externalDependencies = entry.meta?.externalDependencies || []
   const vueReq = externalDependencies.find((d) => d.startsWith('vue@'))
@@ -104,7 +106,7 @@ watchEffect(async () => {
       // 2. Update local ref with error info
       errorMetadata.value = {
         hostVer,
-        requiredVer: vueReq ? vueReq.split('@')[1] : 'Unknown',
+        requiredVer,
         externalDependencies,
         errorMessage: `Incompatible Vue version. Required: ${requiredVer}, Host: ${hostVer}`,
         versionMismatch: true,

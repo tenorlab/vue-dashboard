@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
-import type { IDashboardWidgetProps, TWidgetEmits } from './interfaces'
+import type { IDashboardWidgetProps, TWidgetEmits, TWidgetErrorExtraProps } from './interfaces'
 import DashboardWidgetBase from './DashboardWidgetBase.vue'
 import { useWidgetEmits } from './use-widget-emits'
 import { computed } from 'vue'
@@ -8,7 +8,7 @@ import { computed } from 'vue'
 const props = defineProps<IDashboardWidgetProps>()
 const emits = defineEmits<TWidgetEmits>()
 const { removeClick: onRemoveClick, moveClick: onMoveClick } = useWidgetEmits(emits)
-const extraProps = computed(() => props.extraProps)
+const extraProps = computed<TWidgetErrorExtraProps>(() => props.extraProps)
 </script>
 
 <template>

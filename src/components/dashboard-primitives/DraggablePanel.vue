@@ -7,6 +7,7 @@ interface IDraggablePanelProps {
   testId?: string
   className: string
   style?: CSSProperties
+  zIndex?: number
   onDraggingChange?: (isDragging: boolean) => void
 }
 
@@ -32,6 +33,7 @@ const dragStart = ref({ x: 0, y: 0 })
 const panelStart = ref({ x: 0, y: 0 })
 
 // --- Constants and Styles ---
+const zIndex = typeof props.zIndex !== 'undefined' ? Number(props.zIndex) : 99999
 
 const defaultFloatingStyles: CSSProperties = {
   // 1. Take it out of the document flow
@@ -40,7 +42,7 @@ const defaultFloatingStyles: CSSProperties = {
   top: '6rem',
   right: '1rem',
   // 3. Ensure it stacks above other content
-  zIndex: 1,
+  zIndex,
 
   // Add your layout/appearance styles
   width: '360px',
