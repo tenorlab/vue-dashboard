@@ -1,289 +1,14 @@
 // @tenorlab/vue-dashboard
 // file: src/components/use-dashboard-store.ts
 import { reactive, computed } from 'vue'
-import { blankDashboardConfig, ensureContainersSequence } from '@tenorlab/dashboard-core'
-import type { IDashboardConfig, TDashboardWidgetKey } from '@tenorlab/dashboard-core'
-
-/**
- * @name TAddWidgetResponse
- * @description Type for the response of the addWidget mutation
- * @property {boolean} success - Indicates if the widget was added successfully
- * @property {string} [message] - Optional message providing additional information
- * @property {IDashboardConfig} updatedDashboardConfig - The updated dashboard configuration after adding the widget
- * @property {IDashboardConfig[]} allUpdatedDashboardConfigs - All updated dashboard configurations
- */
-type TAddWidgetResponse = {
-  success: boolean
-  message?: string
-  updatedDashboardConfig: IDashboardConfig
-  allUpdatedDashboardConfigs: IDashboardConfig[]
-}
-type TRemoveWidgetResponse = TAddWidgetResponse
-type TMoveWidgetResponse = TAddWidgetResponse
-
-/**
- * @name _getNextContainerName
- * @description Generates the next container name based on existing containers in the dashboard configuration
- * @param dashboardConfig
- * @returns {string} The next container name in the format 'containerX', where X is the next available number
- */
-const _getNextContainerName = (dashboardConfig: IDashboardConfig) => {
-  // get next container id
-  const containersIds = dashboardConfig.widgets
-    .filter((x) => x.includes('WidgetContainer'))
-    .map((x) => Number(x.split('_')[1].replace('container', '')))
-  let nextId = containersIds.length > 0 ? Math.max(...containersIds) + 1 : 1
-  return `container${nextId}`
-}
-
-/**
- * @name _getNextContainerKey
- * @description Generates the next container widget key based on the dashboard configuration and a given container widget key
- * @param dashboardConfig
- * @param containerWidgetKey
- * @returns {TDashboardWidgetKey} The next container widget key
- */
-const _getNextContainerKey = (
-  dashboardConfig: IDashboardConfig,
-  containerWidgetKey: TDashboardWidgetKey,
-): TDashboardWidgetKey => {
-  const containerName = _getNextContainerName(dashboardConfig)
-  const widgetKey: TDashboardWidgetKey = `${containerWidgetKey}_${containerName}` as any
-  return widgetKey
-}
-
-/**
- * @name _addWidget
- * @description Adds a widget to the dashboard configuration, either at the root level or within a specified parent container
- * @param params
- * @returns {Omit<TAddWidgetResponse, 'allUpdatedDashboardConfigs'>} The response indicating success or failure and the updated dashboard configuration
- */
-const _addWidget = (params: {
-  dashboardConfig: IDashboardConfig
-  widgetKey: TDashboardWidgetKey
-  parentWidgetKey?: TDashboardWidgetKey
-  noDuplicatedWidgets?: boolean
-}): Omit<TAddWidgetResponse, 'allUpdatedDashboardConfigs'> => {
-  const { dashboardConfig, widgetKey, parentWidgetKey, noDuplicatedWidgets } = params
-
-  if (parentWidgetKey) {
-    // if adding to parent container
-    // if noDuplicatedWidgets is true, do not allow to add duplicated widgets:
-    if (
-      noDuplicatedWidgets &&
-      dashboardConfig.childWidgetsConfig.find(
-        (x) => x.parentWidgetKey === parentWidgetKey && x.widgetKey === widgetKey,
-      )
-    ) {
-      return {
-        success: false,
-        message: `DashboardStore: addWidget: Widget already added (${widgetKey})`,
-        updatedDashboardConfig: dashboardConfig,
-      }
-    }
-    const newChildWidgetsConfig = [
-      ...dashboardConfig.childWidgetsConfig,
-      { parentWidgetKey, widgetKey }, // new entry
-    ]
-    return {
-      success: true,
-      updatedDashboardConfig: {
-        ...dashboardConfig,
-        childWidgetsConfig: newChildWidgetsConfig,
-      },
-    }
-  } else {
-    // add root level widget
-    // if noDuplicatedWidgets is true, do not allow to add duplicated widgets:
-    if (noDuplicatedWidgets && dashboardConfig.widgets.includes(widgetKey)) {
-      return {
-        success: false,
-        message: `DashboardStore: addWidget: Widget already added (${widgetKey})`,
-        updatedDashboardConfig: dashboardConfig,
-      }
-    }
-    const newWidgets = [...dashboardConfig.widgets, widgetKey]
-    return {
-      success: true,
-      updatedDashboardConfig: {
-        ...dashboardConfig,
-        widgets: newWidgets,
-      },
-    }
-  }
-}
-
-/**
- * @name _removeWidget
- * @description Removes a widget from the dashboard configuration, either from the root level or from a specified parent container
- * @param dashboardConfig
- * @param widgetKey
- * @param parentWidgetKey
- * @returns {Omit<TRemoveWidgetResponse, 'allUpdatedDashboardConfigs'>} The response indicating success or failure and the updated dashboard configuration
- */
-const _removeWidget = (
-  dashboardConfig: IDashboardConfig,
-  widgetKey: TDashboardWidgetKey,
-  parentWidgetKey?: TDashboardWidgetKey,
-): Omit<TRemoveWidgetResponse, 'allUpdatedDashboardConfigs'> => {
-  const lowerWidgetKey = `${widgetKey || ''}`.trim().toLowerCase()
-  const lowerParentWidgetKey = `${parentWidgetKey || ''}`.trim().toLowerCase()
-
-  if (lowerParentWidgetKey.length > 0) {
-    // if removing from parent container:
-    // save the other containers's widgets:
-    const othersChildWidgets = dashboardConfig.childWidgetsConfig.filter(
-      (entry) => `${entry.parentWidgetKey}`.trim().toLowerCase() !== lowerParentWidgetKey,
-    )
-    // remove current widget from the container matching the parentWidhetKey argument
-    const updateContainerChildWidgets = dashboardConfig.childWidgetsConfig.filter(
-      (entry) =>
-        `${entry.parentWidgetKey}`.trim().toLowerCase() === lowerParentWidgetKey &&
-        `${entry.widgetKey}`.trim().toLowerCase() !== lowerWidgetKey,
-    )
-    // update
-    const newChildWidgetsConfig = [...othersChildWidgets, ...updateContainerChildWidgets]
-    let updatedDashboardConfig = {
-      ...dashboardConfig,
-      childWidgetsConfig: newChildWidgetsConfig,
-    }
-
-    // if removing container, ensure correct container sequence but keep original order
-    const isContainer = lowerWidgetKey.includes('container')
-    if (isContainer) {
-      updatedDashboardConfig = ensureContainersSequence(updatedDashboardConfig)
-    }
-
-    return {
-      success: true,
-      updatedDashboardConfig,
-    }
-  } else {
-    // remove the root level widget
-    const allWidgets = dashboardConfig.widgets || []
-
-    const updatedWidgets = allWidgets.filter(
-      (key) => `${key}`.trim().toLowerCase() !== lowerWidgetKey,
-    )
-    // if the widget being removed is a container, remove also all its childWidgets
-    const updatedChildWidgets = dashboardConfig.childWidgetsConfig.filter(
-      (entry) => `${entry.parentWidgetKey}`.trim().toLowerCase() !== lowerWidgetKey,
-    )
-    return {
-      success: true,
-      updatedDashboardConfig: {
-        ...dashboardConfig,
-        widgets: updatedWidgets,
-        childWidgetsConfig: updatedChildWidgets,
-      },
-    }
-  }
-}
-
-/**
- * @name _moveWidget
- * @description Moves a widget within the dashboard configuration, either at the root level or within a specified parent container
- * @param dashboardConfig
- * @param direction
- * @param widgetKey
- * @param parentWidgetKey
- * @returns {Omit<TMoveWidgetResponse, 'allUpdatedDashboardConfigs'>} The response indicating success or failure and the updated dashboard configuration
- */
-const _moveWidget = (
-  dashboardConfig: IDashboardConfig,
-  direction: -1 | 1,
-  widgetKey: TDashboardWidgetKey,
-  parentWidgetKey?: TDashboardWidgetKey,
-): Omit<TMoveWidgetResponse, 'allUpdatedDashboardConfigs'> => {
-  const lowerWidgetKey = `${widgetKey || ''}`.trim().toLowerCase()
-  const lowerParentWidgetKey = `${parentWidgetKey || ''}`.trim().toLowerCase()
-  if (lowerParentWidgetKey.length > 0) {
-    // if moving inside parent container:
-    // save the other containers's widgets:
-    const othersChildWidgets = dashboardConfig.childWidgetsConfig.filter(
-      (entry) => `${entry.parentWidgetKey}`.trim().toLowerCase() !== lowerParentWidgetKey,
-    )
-    // get this container widgets:
-    let containerChildWidgets = dashboardConfig.childWidgetsConfig.filter(
-      (entry) => `${entry.parentWidgetKey}`.trim().toLowerCase() === lowerParentWidgetKey,
-    )
-    const childWidget = containerChildWidgets.find(
-      (x) => `${x.widgetKey}`.trim().toLowerCase() === lowerWidgetKey,
-    )
-    const currentIndex = containerChildWidgets.indexOf(childWidget!)
-    let newIndex = currentIndex + direction
-
-    // Ensure the new index is within the array bounds
-    // If moving left past the start (index 0), keep it at 0.
-    newIndex = Math.max(0, newIndex)
-    // If moving right past the end, keep it at the last index (containerChildWidgets.length - 1).
-    newIndex = Math.min(containerChildWidgets.length - 1, newIndex)
-
-    // If the new index is the same as the current index, return
-    if (newIndex === currentIndex) {
-      return {
-        success: false,
-        message: `DashboardStore: moveWidget: Widget already at min/max position (${widgetKey})`,
-        updatedDashboardConfig: dashboardConfig,
-      }
-    }
-
-    // update position
-    const updatedWidgets = [...containerChildWidgets]
-    // Remove the element from its current position
-    // splice(start, deleteCount) returns an array of the deleted elements
-    const [elementToMove] = updatedWidgets.splice(currentIndex, 1)
-    // Insert the element into its new position
-    // splice(start, deleteCount, item1)
-    updatedWidgets.splice(newIndex, 0, elementToMove)
-
-    // return updated config
-    return {
-      success: true,
-      updatedDashboardConfig: {
-        ...dashboardConfig,
-        childWidgetsConfig: [...othersChildWidgets, ...updatedWidgets],
-      },
-    }
-  } else {
-    // move root level widget
-    const allWidgets = dashboardConfig.widgets || []
-    const allWidgetsLower = allWidgets.map((x) => `${x}`.trim().toLowerCase())
-    const currentIndex = allWidgetsLower.indexOf(lowerWidgetKey)
-    let newIndex = currentIndex + direction
-
-    // Ensure the new index is within the array bounds
-    // If moving left past the start (index 0), keep it at 0.
-    newIndex = Math.max(0, newIndex)
-    // If moving right past the end, keep it at the last index (allWidgets.length - 1).
-    newIndex = Math.min(allWidgets.length - 1, newIndex)
-
-    // If the new index is the same as the current index, return
-    if (newIndex === currentIndex) {
-      return {
-        success: false,
-        message: `DashboardStore: moveWidget: Widget already at min/max position (${widgetKey})`,
-        updatedDashboardConfig: dashboardConfig,
-      }
-    }
-
-    // update position
-    const updatedWidgets = [...allWidgets]
-    // Remove the element from its current position
-    // splice(start, deleteCount) returns an array of the deleted elements
-    const [elementToMove] = updatedWidgets.splice(currentIndex, 1)
-    // Insert the element into its new position
-    // splice(start, deleteCount, item1)
-    updatedWidgets.splice(newIndex, 0, elementToMove)
-    return {
-      success: true,
-      updatedDashboardConfig: {
-        ...dashboardConfig,
-        widgets: updatedWidgets,
-      },
-    }
-  }
-}
+import { blankDashboardConfig, dashboardStoreUtils } from '@tenorlab/dashboard-core'
+import type {
+  IDashboardConfig,
+  TDashboardWidgetKey,
+  TAddWidgetResponse,
+  TRemoveWidgetResponse,
+  TMoveWidgetResponse,
+} from '@tenorlab/dashboard-core'
 
 /**
  * @name IDashboardState
@@ -374,7 +99,7 @@ const _mutations = {
   }): TAddWidgetResponse & {
     allUpdatedDashboardConfigs: IDashboardConfig[]
   } => {
-    const resp = _addWidget({
+    const resp = dashboardStoreUtils.addWidget({
       dashboardConfig: _state.currentDashboardConfig,
       ...params,
     })
@@ -398,7 +123,11 @@ const _mutations = {
     widgetKey: TDashboardWidgetKey,
     parentWidgetKey?: TDashboardWidgetKey,
   ): TRemoveWidgetResponse => {
-    const resp = _removeWidget(_state.currentDashboardConfig, widgetKey, parentWidgetKey)
+    const resp = dashboardStoreUtils.removeWidget(
+      _state.currentDashboardConfig,
+      widgetKey,
+      parentWidgetKey,
+    )
     const allUpdatedDashboardConfigs = [
       ..._state.allDashboardConfigs.filter(
         (x) => x.dashboardId !== resp.updatedDashboardConfig.dashboardId,
@@ -419,8 +148,13 @@ const _mutations = {
     direction: -1 | 1,
     widgetKey: TDashboardWidgetKey,
     parentWidgetKey?: TDashboardWidgetKey,
-  ): TRemoveWidgetResponse => {
-    const resp = _moveWidget(_state.currentDashboardConfig, direction, widgetKey, parentWidgetKey)
+  ): TMoveWidgetResponse => {
+    const resp = dashboardStoreUtils.moveWidget(
+      _state.currentDashboardConfig,
+      direction,
+      widgetKey,
+      parentWidgetKey,
+    )
     const allUpdatedDashboardConfigs = [
       ..._state.allDashboardConfigs.filter(
         (x) => x.dashboardId !== resp.updatedDashboardConfig.dashboardId,
@@ -486,7 +220,7 @@ const _actions = {
  */
 const _getters = {
   getNextContainerKey: (containerWidgetKey: TDashboardWidgetKey): TDashboardWidgetKey =>
-    _getNextContainerKey(_state.currentDashboardConfig, containerWidgetKey),
+    dashboardStoreUtils.getNextContainerKey(_state.currentDashboardConfig, containerWidgetKey),
   getCurrentDashboardConfig: (): IDashboardConfig => _state.currentDashboardConfig,
   getCurrentDashboardId: (): string => _state.currentDashboardConfig.dashboardId,
   getIsResponsive: (): boolean => _state.currentDashboardConfig.responsiveGrid || false,
