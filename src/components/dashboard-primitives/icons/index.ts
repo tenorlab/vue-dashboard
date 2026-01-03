@@ -3,6 +3,7 @@
 export { default as AddIcon } from './AddIcon.vue'
 export { default as DeleteIcon } from './DeleteIcon.vue'
 export { default as EditIcon } from './EditIcon.vue'
+export { default as RenameIcon } from './RenameIcon.vue'
 export { default as GridIcon } from './GridIcon.vue'
 export { default as SettingsIcon } from './SettingsIcon.vue'
 export { default as ZoomInIcon } from './ZoomInIcon.vue'
