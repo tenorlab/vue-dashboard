@@ -4,14 +4,20 @@ Foundation components for creating user-configurable, high-performance dashboard
 
 ## 🏗 Relationship to Core
 
-This package extends **@tenorlab/dashboard-core**. It provides the Vue implementation of the core logic, including specialized hooks, state management via **Zustand**, and a suite of UI components.
+This package extends **@tenorlab/dashboard-core**. It provides the Vue implementation of the core logic, including specialized hooks, state management, and a suite of UI components.
 
 > **Note**: This package re-exports all types and utilities from `@tenorlab/dashboard-core`. You do not need to install the core package separately.
+
+
+## Demos
+-- [React Demo](https://react.tenorlab.com) (built with @tenorlab/react-dashboard)
+-- [Vue Demo](https://vue.tenorlab.com) (built with @tenorlab/vue-dashboard)
+
 
 ## ✨ Features
 
 - **Type-Safe:** Deep integration with TypeScript 5.8+ for full IDE support.
-- **State Management:** Built-in `useDashboardStore` (Zustand) and `useDashboardUndoService`.
+- **State Management:** Built-in `useDashboardStore` and `useDashboardUndoService`.
 - **User Configurable:** Ready-to-use components for adding, removing, and dragging widgets.
 - **Themeable:** Native support for CSS Variables and Tailwind CSS.
 - **Vite Optimized:** Full ESM support and tree-shakeable.
@@ -397,7 +403,22 @@ For a complete example including **Undo/Redo**, **Zooming**, **Catalog Flyouts**
 - **`useDashboardStore`**: Access the underlying Zustand store to manage widget state, layout, and configuration.
 - **`useDashboardUndoService`**: Provides `undo` and `redo` functionality for user layout changes.
 
+
 ------
+
+
+## Links
+ - [@tenorlab/react-dashboard](https://www.npmjs.com/package/@tenorlab/react-dashboard): React-specific components
+ - [@tenorlab/vue-dashboard](https://www.npmjs.com/package/@tenorlab/vue-dashboard): Vue-specific components
+ - [Official Website](https://www.tenorlab.com)
+ - [React Demo](https://react.tenorlab.com) (built with @tenorlab/react-dashboard)
+ - [Vue Demo](https://vue.tenorlab.com) (built with @tenorlab/vue-dashboard)
+ - [Buy a License](https://payhip.com/b/gPBpo)
+ - [Follow on BlueSky](https://bsky.app/profile/tenorlab.bsky.social)
+
+
+------
+
 
 ## ⚖️ Licensing
 
@@ -407,3 +428,4 @@ This project is dual-licensed:
 2. **Commercial Use:** Requires a **Tenorlab Commercial License**.
 
 If you are using this library to build a revenue-generating product or within a commercial entity, please visit [https://payhip.com/b/gPBpo](https://payhip.com/b/gPBpo) to purchase a license.
+
