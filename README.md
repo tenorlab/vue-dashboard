@@ -395,7 +395,7 @@ For a complete example including **Undo/Redo**, **Zooming**, **Catalog Flyouts**
 
 ### Hooks & State
 
-- **`useDashboardStore`**: Access the underlying Zustand store to manage widget state, layout, and configuration.
+- **`useDashboardStore`**: Access the underlying reactive store to manage widget state, layout, and configuration.
 - **`useDashboardUndoService`**: Provides `undo` and `redo` functionality for user layout changes.
 
 
