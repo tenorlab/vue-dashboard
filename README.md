@@ -74,8 +74,6 @@ import type {
 } from '@tenorlab/vue-dashboard'
 import { DashboardWidgetBase, WrapperColumnContent, useWidgetEmits } from '@tenorlab/vue-dashboard'
 
-const WidgetKey: TDashboardWidgetKey = 'WidgetTotalOrders'
-
 defineProps<IDashboardWidgetProps>()
 const emits = defineEmits<TWidgetEmits>()
 const { removeClick: onRemoveClick, moveClick: onMoveClick } = useWidgetEmits(emits)
@@ -83,12 +81,9 @@ const { removeClick: onRemoveClick, moveClick: onMoveClick } = useWidgetEmits(em
 
 <template>
   <DashboardWidgetBase
-    :widgetKey="WidgetKey"
+    v-bind="props"
+    widgetKey="WidgetTotalOrders"
     title="Total Orders"
-    :parentWidgetKey="parentWidgetKey"
-    :index="index"
-    :maxIndex="maxIndex"
-    :isEditing="isEditing"
     @removeClick="onRemoveClick"
     @moveClick="onMoveClick"
   >
