@@ -1,0 +1,36 @@
+name: BlueSky Release Post
+
+on:
+  push:
+    tags:
+      - 'v*' # This means: "Run this whenever I push a tag starting with 'v'"
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Send Post to BlueSky
+        uses: myConsciousness/bluesky-post@v5
+        with:
+          # Improved Copy
+          text: |
+            🚀 [@tenorlab/vue-dashboard](https://www.npmjs.com/package/@tenorlab/vue-dashboard) ${{ github.ref_name }} published on NPM.
+            
+            ✨ Demo: https://vue.tenorlab.com
+
+            #vue #dashboards #typescript
+
+          identifier: ${{ secrets.BSKY_HANDLE }}
+          password: ${{ secrets.BSKY_PASSWORD }}
+
+          # Image OPTION: 
+          # To use this, ensure the file exists in your repo.
+          # Recommended Size: `1200 x 630 pixels` or `1080 x 1080 pixels`, max 1MB in size
+          # Path to your image in the repo
+          media: ./readme-images/bsky-post-1080x1080.webp
+
+          # Accessibility Alt Text
+          media-alt: "Screenshot of the @tenorlab/vue-dashboard version ${{ github.ref_name }} demo."
