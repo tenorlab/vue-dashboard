@@ -1,7 +1,5 @@
 # @tenorlab/vue-dashboard
 
-# @tenorlab/vue-dashboard
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Template: Pro](https://img.shields.io/badge/Template-Pro--Available-gold.svg)](https://www.tenorlab.com)
 [![Framework: Vue](https://img.shields.io/badge/Framework-Vue-42b883.svg)](https://vuejs.org/)
