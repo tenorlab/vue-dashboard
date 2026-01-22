@@ -6,34 +6,32 @@
 
 Foundation components for creating user-configurable, high-performance dashboards in Vue.
 
-## 🏗 Relationship to Core
+## Relationship to Core
 
 This package extends **@tenorlab/dashboard-core**. It provides the Vue implementation of the core logic, including specialized hooks, state management, and a suite of UI components.
 
 > **Note**: This package re-exports all types and utilities from `@tenorlab/dashboard-core`. You do not need to install the core package separately.
 
 
-## Demos
-
-* [**React Demo**](https://react.tenorlab.com) (built with **@tenorlab/react-dashboard**)
-* [**Vue Demo**](https://vue.tenorlab.com) (built with **@tenorlab/vue-dashboard**)
+## Pro Template Demos
+  - [React Demo](https://react.tenorlab.com) (built with @tenorlab/react-dashboard)
+  - [Vue Demo](https://vue.tenorlab.com) (built with @tenorlab/vue-dashboard)
+  - [Nuxt Demo](https://nuxt.tenorlab.com) (built with @tenorlab/vue-dashboard)
 
 
 ## ✨ Features
 
-- **Type-Safe:** Deep integration with TypeScript 5.8+ for full IDE support.
-- **State Management:** Built-in `useDashboardStore` and `useDashboardUndoService`.
-- **User Configurable:** Ready-to-use components for adding, removing, and dragging widgets.
-- **Themeable:** Native support for CSS Variables and Tailwind CSS.
-- **Vite Optimized:** Full ESM support and tree-shakeable.
+  - **Type-Safe:** Deep integration with TypeScript 5.8+ for full IDE support.
+  - **State Management:** Built-in `useDashboardStore` and `useDashboardUndoService`.
+  - **User Configurable:** Ready-to-use components for adding, removing, and dragging widgets.
+  - **Themeable:** Native support for CSS Variables and Tailwind CSS.
+  - **Vite Optimized:** Full ESM support and tree-shakeable.
 
 ## 🚀 Quick Start
 
 ### Installation
 
-Bash
-
-```
+```bash
 # with npm
 npm i @tenorlab/vue-dashboard
 
@@ -57,42 +55,35 @@ import '@tenorlab/vue-dashboard/styles.css'
 
 Widgets should be organized by their loading strategy.
 
-- **Bundled Widgets**: Place in `src/bundled-widgets/` (loaded immediately).
-- **Async Widgets**: Place in `src/async-widgets/` (lazy-loaded).
+  - **Bundled Widgets**: Place in `src/bundled-widgets/` (loaded immediately).
+  - **Async Widgets**: Place in `src/async-widgets/` (lazy-loaded).
+
+*(NOTE: These directory names are suggestions; you can use different names, or put the widgets under src/components if you prefer)*
+
 
 Each widget requires a sub-directory using the `widget-name-here` convention.
 
 #### Example: `WidgetTotalOrders`
 
 Directory name `widget-total-orders`, files:
-- WidgetTotalOrders.vue
-- meta.ts
-- index.ts
+  - WidgetTotalOrders.vue
+  - meta.ts
+  - index.ts
 
-```Vue
-// file: src/bundled-widgets/widget-total-orders/WidgetTotalOrders.vue
+File: src/bundled-widgets/widget-total-orders/WidgetTotalOrders.vue:
+```vue
 <script setup lang="ts">
-import type {
-  IDashboardWidgetProps,
-  TDashboardWidgetKey,
-  TWidgetEmits,
-} from '@tenorlab/vue-dashboard'
+import type { IDashboardWidgetProps, TWidgetEmits } from '@tenorlab/vue-dashboard'
 import { DashboardWidgetBase, WrapperColumnContent, useWidgetEmits } from '@tenorlab/vue-dashboard'
 
-defineProps<IDashboardWidgetProps>()
+const props = defineProps<IDashboardWidgetProps>()
 const emits = defineEmits<TWidgetEmits>()
-const { removeClick: onRemoveClick, moveClick: onMoveClick } = useWidgetEmits(emits)
+const emitHandlers = useWidgetEmits(emits)
 </script>
 
 <template>
-  <DashboardWidgetBase
-    v-bind="props"
-    widgetKey="WidgetTotalOrders"
-    title="Total Orders"
-    @removeClick="onRemoveClick"
-    @moveClick="onMoveClick"
-  >
-    <WrapperColumnContent>
+  <DashboardWidgetBase v-bind="props" v-on="emitHandlers">
+    <WrapperColumnContent><!-- WrapperColumnContent is optional, you are free to use a div or other html elements here -->
       <div class="dashboard-number number-xl text-primary">1,250</div>
       <div class="text-sm">Orders this month</div>
     </WrapperColumnContent>
@@ -100,11 +91,11 @@ const { removeClick: onRemoveClick, moveClick: onMoveClick } = useWidgetEmits(em
 </template>
 ```
 
+File: src/bundled-widgets/widget-total-orders/meta.ts:
 ```typescript
-// file: src/bundled-widgets/widget-total-orders/meta.ts
 import type { TWidgetMetaInfo } from '@tenorlab/vue-dashboard'
-import { MonitorIcon as ComponentIcon } from '@tenorlab/vue-dashboard'
 import { markRaw } from 'vue'
+import { ReceiptIcon as ComponentIcon } from 'lucide-vue-next'
 
 // Define the metadata object for the plugin
 export const WidgetTotalOrdersMeta: TWidgetMetaInfo = {
@@ -117,8 +108,8 @@ export const WidgetTotalOrdersMeta: TWidgetMetaInfo = {
 }
 ```
 
+File: src/bundled-widgets/widget-total-orders/index.ts:
 ```typescript
-// file: src/bundled-widgets/widget-total-orders/index.ts
 import WidgetTotalOrders from './WidgetTotalOrders.vue'
 export default WidgetTotalOrders
 ```
@@ -129,25 +120,26 @@ export default WidgetTotalOrders
 Create `src/widgets-catalog.ts` in your project root. This file manages how widgets are discovered (locally via Vite's `import.meta.glob` or remotely via CDN).
 
 
+File: src/widgets-catalog.ts:
 ```typescript
-// file: src/widgets-catalog.ts
+import { WidgetContainerColumn, WidgetContainerLarge, WidgetContainerRow } from '@tenorlab/vue-dashboard'
+import { createStaticEntry, localWidgetDiscovery, remoteWidgetDiscovery } from '@tenorlab/vue-dashboard/core'
+import { getWidgetsManifestUrl } from '@/utils/'
+
+// optional: other static widgets to add manually
 import {
+  WidgetSmallCardSample,
+} from './other-widgets/other-widgets'
+// meta data map for other static widgets:
+import { otherWidgetsMetaMap } from './other-widgets/other-widgets-meta'
+import type {
   IDynamicWidgetCatalogEntry,
   TDashboardWidgetCatalog,
   TWidgetMetaInfoBase,
-  WidgetContainerColumn,
-  WidgetContainerLarge,
-  WidgetContainerRow,
   TWidgetFactory,
+  TDashboardWidgetKey,
+  TWidgetMetaInfo,
 } from '@tenorlab/vue-dashboard'
-import {
-  createStaticEntry,
-  localWidgetDiscovery,
-  remoteWidgetDiscovery,
-} from '@tenorlab/vue-dashboard/core'
-
-import WidgetRecentPaymentInfo from './other-widgets/WidgetRecentPaymentInfo.vue'
-//import { getWidgetsManifestUrl } from '@/utils'
 
 const bundledWidgetsSrcPath = '/src/bundled-widgets'
 const asyncWidgetsSrcPath = '/src/async-widgets'
@@ -170,7 +162,7 @@ const allMetaModules = import.meta.glob('/src/**/widget-*/meta.ts', {
   eager: true,
 }) as Record<string, Record<string, TWidgetMetaInfoBase>>
 
-const hasPermission = (_user: any, _permission: string) => true
+const hasPermission = (_user_: any, _permission: string) => true
 
 /**
  * @name getWidgetCatalog
@@ -179,34 +171,51 @@ const hasPermission = (_user: any, _permission: string) => true
 export const getWidgetCatalog = async (user: any | null): Promise<TDashboardWidgetCatalog> => {
   // A. Register Static Core Components
   const catalogMapEntries: [string, IDynamicWidgetCatalogEntry][] = [
-    createStaticEntry('WidgetContainer', WidgetContainerColumn),
-    createStaticEntry('WidgetContainerRow', WidgetContainerRow),
-    createStaticEntry('WidgetContainerLarge', WidgetContainerLarge),
+    createStaticEntry('WidgetContainer', WidgetContainerColumn, otherWidgetsMetaMap['WidgetContainer']),
+    createStaticEntry('WidgetContainerRow', WidgetContainerRow, otherWidgetsMetaMap['WidgetContainerRow']),
+    createStaticEntry(
+      'WidgetContainerLarge',
+      WidgetContainerLarge,
+      otherWidgetsMetaMap['WidgetContainerLarge'],
+    ),
   ]
 
-  // B. Register Business Static Widgets
-  // we could filter further by permissions and user type if needed
+  // B. Optional: Register Business Static Widgets manually:
+  // Example: you could filter further by permissions and user type if needed
   if (hasPermission(user, 'some-permission')) {
-    catalogMapEntries.push(createStaticEntry('WidgetRecentPaymentInfo', WidgetRecentPaymentInfo))
+    // i.e.:
+    // catalogMapEntries.push(
+    //   createStaticEntry(
+    //     'WidgetThatRequiresPermissions',
+    //     WidgetThatRequiresPermissions,
+    //     otherWidgetsMetaMap['WidgetThatRequiresPermissions'],
+    //   ),
+    // )
   }
 
-  // add bundled-widgets
-  catalogMapEntries.push(...localWidgetDiscovery(
-    bundledWidgetsSrcPath,
-    bundledWidgetModules,
-    allMetaModules,
-    false, // lazy: false
-  ))
+  // C. Register widgets automatically with the localWidgetDiscovery helper:
+  // (bundled widgets are included always, non-lazy)
+  catalogMapEntries.push(
+    ...localWidgetDiscovery(
+      bundledWidgetsSrcPath,
+      bundledWidgetModules,
+      allMetaModules,
+      false, // lazy: false
+    ),
+  )
 
-  // Async widgets (dynamically loaded, like plugins)
-  catalogMapEntries.push(...localWidgetDiscovery(
-    asyncWidgetsSrcPath,
-    asyncWidgetModules,
-    allMetaModules,
-    true, // lazy: true
-  ))
+  // D. Register "lazy" widgets automatically with the localWidgetDiscovery helper:
+  // (async widgets are not incuded, they are lazy loaded at run time)
+  catalogMapEntries.push(
+    ...localWidgetDiscovery(
+      asyncWidgetsSrcPath,
+      asyncWidgetModules,
+      allMetaModules,
+      true, // lazy: true
+    )
+  )
 
-  // Optional: Remote discovery of -pre-built widgets hosted on a CDN
+  // E. Optional: Remote discovery of -pre-built widgets hosted on a CDN (requires advance importMaps setup and other configuration)
   /*const manifestUrl = getWidgetsManifestUrl()
   if (manifestUrl.length > 0) {
     const remoteResponse = await remoteWidgetDiscovery(manifestUrl)
@@ -223,22 +232,23 @@ export const getWidgetCatalog = async (user: any | null): Promise<TDashboardWidg
 
 Use a `dashboard-defaults.ts` file to define initial layouts based on user roles.
 
+File: src/dashboard-defaults.ts:
 ```typescript
-// file: src/dashboard-defaults.ts
-import {
+import { blankDashboardConfig, cssSettingsCatalog } from '@tenorlab/vue-dashboard/core'
+import { getWidgetCatalog } from './widgets-catalog'
+import type {
   TDashboardWidgetKey,
   IChildWidgetConfigEntry,
   IDashboardConfig,
   TDashboardWidgetCatalog,
 } from '@tenorlab/vue-dashboard'
-import { blankDashboardConfig, cssSettingsCatalog } from '@tenorlab/vue-dashboard/core'
-import { getWidgetCatalog } from './widgets-catalog'
 
 // reserved identifier to be used only for the default dashboard
 const DEFAULT_DASHBOARD_ID = 'default' as const
 const DEFAULT_DASHBOARD_NAME = 'Default' as const
 
-const getDefaultDashboardForCustomerUser = (
+// default dashboard config for Regular user type
+const getDefaultDashboardForRegularUser = (
   user: any,
   clientAppKey: string,
   availableWidgetKeys: TDashboardWidgetKey[]
@@ -250,10 +260,21 @@ const getDefaultDashboardForCustomerUser = (
     dashboardId: DEFAULT_DASHBOARD_ID,
     dashboardName: DEFAULT_DASHBOARD_NAME,
     zoomScale: 1,
-    responsiveGrid: false,
-    widgets: ['WidgetContainer_container1'],
+    responsiveGrid: true,
+    widgets: [
+      'WidgetContainer_container1', // will contain other widgets specified in the childWidgetsConfig secitno below
+      'WidgetBarGradients',
+      ],
     childWidgetsConfig: [
-      { parentWidgetKey: 'WidgetContainer_container1', widgetKey: 'WidgetRecentPaymentInfo' }
+      // two widgets go into container1:
+      { 
+        parentWidgetKey: 'WidgetContainer_container1', 
+        widgetKey: 'WidgetTotalOrders' 
+      },
+      { 
+        parentWidgetKey: 'WidgetContainer_container1', 
+        widgetKey: 'WidgetTotalOrders' 
+      }
     ],
     cssSettings: [...cssSettingsCatalog]
   }
@@ -268,10 +289,16 @@ export const getDashboardDefaults = async (
 }> => {
   const widgetsCatalog = await getWidgetCatalog(user)
 
-  if (!user) return { dashboardConfig: blankDashboardConfig, widgetsCatalog }
+  if (!user) {
+    return {
+      dashboardConfig: blankDashboardConfig,
+      widgetsCatalog,
+    }
+  }
 
   return {
-    dashboardConfig: getDefaultDashboardForCustomerUser(user, clientAppKey, [...widgetsCatalog.keys()]),
+    // Optional, you could use different routines depending on user role:
+    dashboardConfig: getDefaultDashboardForRegularUser(user, clientAppKey, [...widgetsCatalog.keys()]),
     widgetsCatalog
   }
 }
@@ -281,15 +308,11 @@ export const getDashboardDefaults = async (
 
 Use this for a simplified, non-editable view of the dashboard.
 
-TypeScript
-
+File: src/views/DashboardReadonly.vue:
 ```vue
 <script setup lang="ts">
-// file: src/views/DashboardReadonly.vue
-import { reactive, watch, onMounted } from 'vue'
+import { reactive, shallowRef, watch, onMounted } from 'vue'
 import {
-  IDashboardConfig,
-  TDashboardWidgetCatalog,
   useDashboardStore,
 } from '@tenorlab/vue-dashboard'
 import {
@@ -299,6 +322,10 @@ import {
 } from '@tenorlab/vue-dashboard/core'
 import { DynamicWidgetLoader, DashboardGrid } from '@tenorlab/vue-dashboard'
 import { getDashboardDefaults } from '../dashboard-defaults'
+import type {
+  IDashboardConfig,
+  TDashboardWidgetCatalog,
+} from '@tenorlab/vue-dashboard'
 
 const clientAppKey = 'myclientapp'
 const user = { id: 1234 }
@@ -313,15 +340,13 @@ const {
   targetContainerKey,
 } = dashboardStore.computed
 
-type TState = {
-  defaultDashboardConfig: IDashboardConfig
-  widgetsCatalog: TDashboardWidgetCatalog
-}
-
+// 1. Standard reactive state for primitive data
 const localState = reactive<TState>({
   defaultDashboardConfig: blankDashboardConfig,
-  widgetsCatalog: new Map(),
 })
+// 2. Shallow ref for the Catalog (Zero deep-proxying)
+const widgetsCatalog = shallowRef<TDashboardWidgetCatalog>(new Map())
+const getWidgetCatalog = () => widgetsCatalog.value
 
 const getDefaultDashboardConfig = (): IDashboardConfig => {
   return localState.defaultDashboardConfig
@@ -332,11 +357,11 @@ async function _fetchDashboardConfig() {
   const savedConfigs = await dashboardStorageService.getSavedDashboards(
     userId,
     clientAppKey,
-    localState.widgetsCatalog,
+    getWidgetCatalog(),
     defaultConfig,
   )
   dashboardStore.setAllDashboardConfigs(savedConfigs)
-  // show default or first dashboard
+  // show default dashboard or first dashboard
   const dashboardConfig =
     savedConfigs.find((x) => x.dashboardId === 'default') || savedConfigs[0] || defaultConfig
   dashboardStore.setCurrentDashboardConfig(dashboardConfig)
@@ -347,7 +372,7 @@ async function _fetchDashboardConfig() {
 onMounted(async () => {
   const defaults = await getDashboardDefaults(user, clientAppKey)
   localState.defaultDashboardConfig = defaults.dashboardConfig
-  localState.widgetsCatalog = defaults.widgetsCatalog
+  widgetsCatalog.value = defaults.widgetsCatalog
   await _fetchDashboardConfig()
 })
 </script>
@@ -368,7 +393,7 @@ onMounted(async () => {
         :index="index"
         :maxIndex="currentDashboardConfig.widgets.length - 1"
         :childWidgetsConfig="currentDashboardConfig.childWidgetsConfig"
-        :widgetCatalog="localState.widgetsCatalog"
+        :widgetCatalog="widgetsCatalog"
         :isEditing="isEditing"
         :extraProps="dashboardContext"
         @removeClick="() => {}"
@@ -383,8 +408,7 @@ onMounted(async () => {
 
 #### 5. Full Editable Dashboard
 
-For a complete example including **Undo/Redo**, **Zooming**, **Catalog Flyouts**, and **Multiple Dashboards**, please refer to the [Full Implementation Example](https://github.com/tenorlab/vue-dashboard-sample/blob/main/views/DashboardFullExample.vue).
-
+For editable dashboard examples, including **Undo/Redo**, **Zooming**, **Catalog Flyouts**, and **Multiple Dashboards**, please refer to the [Pro Template](https://www.tenorlab.com).
 
 
 ------
@@ -393,15 +417,15 @@ For a complete example including **Undo/Redo**, **Zooming**, **Catalog Flyouts**
 
 ### UI Components
 
-- **`DashboardGrid`**: The main layout engine for positioning widgets.
-- **`WidgetContainer`**: Wrapper providing common widget UI (headers, actions, loading states).
-- **`WidgetsCatalogFlyout`**: A draggable panel for users to browse and add new widgets.
-- **`DynamicWidgetLoader`**: The core widget loader component.
+- **`DashboardGrid`**: The main dashboard layout that position widgets within a responsive grid.
+- **`WidgetContainer`**: A special "widget" that is a container for other widgets.
+- **`WidgetsCatalogFlyout`**: A slide-out panel for users to browse and add new widgets on editable dashboards.
+- **`DynamicWidgetLoader`**: The core lazy-loading widget loader that renders the widgets within the grid.
 
 ### Hooks & State
 
 - **`useDashboardStore`**: Access the underlying reactive store to manage widget state, layout, and configuration.
-- **`useDashboardUndoService`**: Provides `undo` and `redo` functionality for user layout changes.
+- **`useDashboardUndoService`**: Provides `undo` and `redo` functionality for user layout changes in editable dashboard (optional).
 
 
 ------
@@ -409,13 +433,19 @@ For a complete example including **Undo/Redo**, **Zooming**, **Catalog Flyouts**
 
 ## Links
 
+### Open source core packages
  - [@tenorlab/react-dashboard](https://www.npmjs.com/package/@tenorlab/react-dashboard): React-specific components
  - [@tenorlab/vue-dashboard](https://www.npmjs.com/package/@tenorlab/vue-dashboard): Vue-specific components
- - [Official Website](https://www.tenorlab.com)
- - [React Demo](https://react.tenorlab.com)
- - [Vue Demo](https://vue.tenorlab.com)
- - [Get the Pro Template](https://payhip.com/b/gPBpo)
+
+### Pro Template Demos
+ - [React Demo](https://react.tenorlab.com) (built with @tenorlab/react-dashboard)
+ - [Vue Demo](https://vue.tenorlab.com) (built with @tenorlab/vue-dashboard)
+ - [Nuxt Demo](https://nuxt.tenorlab.com) (built with @tenorlab/vue-dashboard)
+
+### Others
+ - [Buy a License](https://payhip.com/b/gPBpo)
  - [Follow on BlueSky](https://bsky.app/profile/tenorlab.bsky.social)
+ - [Official Website](https://www.tenorlab.com)
 
 
 ------
@@ -431,10 +461,7 @@ It provides the foundational components and logic for building dashboards. You a
 
 A commercial license for a full-blown professional app template is available for purchase [**here**](https://www.tenorlab.com) and comes with:
 
-* **Full Application Shell:** A clean, optimized Vite + TypeScript project structure (with either React or Vue).
+* **Full Application Shell:** A clean, optimized Vite + TypeScript project structure (with either React, Vue or Nuxt).
 * **Dashboard Management:** Production-ready logic for creating, listing, renaming, and deleting multiple user-defined dashboards.
-* **Implementation Examples:** Expert patterns for both "Read-Only" (Analyst view) and "User-Editable" (Admin view) dashboard modes.
+* **Implementation Examples:** Best patterns for both "Read-Only" (Analyst view) and "User-Editable" (Admin view) dashboard modes, a dynamic dashboard menu, etc.
 * **Tenorlab Theme Engine:** A sophisticated Tailwind-based system supporting multiple custom themes (not just Light/Dark mode).
-
-
-[**Live React Demo**](https://react.tenorlab.com), [**Live Vue Demo**](https://vue.tenorlab.com)
