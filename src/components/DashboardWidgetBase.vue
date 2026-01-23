@@ -15,14 +15,24 @@ const emits = defineEmits<TWidgetEmits>()
 const defaultActionIconSize = 'size-5'
 const computedHideTitle = computed(() => props.hideTitle && !props.isEditing)
 
-const rootCssClass = computed(() => {
-  const borderCssClasses = props.borderCssClasses || ''
+const _getCssClasses = (): string => {
+  // if overrideCssClasses is provided, we do not compute any css classes but use the ones provided:
+  if ((props.overrideCssClasses || '').trim().length > 0) {
+    return (props.overrideCssClasses || '').trim()
+  }
+
+  const flowDirection = props.direction || 'column'
   const noBorder = props.noBorder
-  let cssClass = `dashboard-widget ${props.isEditing ? 'editing' : ''} border border-solid`
+
+  let cssClass = `dashboard-widget direction-${flowDirection} ${props.isEditing ? 'editing' : ''} border border-solid`
+
+  if (['large', 'xlarge'].indexOf(props.size || '') > -1) {
+    cssClass = `${cssClass} ${props.size}-widget`
+  }
 
   if (!noBorder) {
-    if ((borderCssClasses || '').trim().length > 0) {
-      cssClass = `${cssClass} ${borderCssClasses}`
+    if ((props.borderCssClasses || '').trim().length > 0) {
+      cssClass = `${cssClass} ${props.borderCssClasses}`
     } else {
       cssClass = `${cssClass} border-card-invert border-opacity-20`
     }
@@ -30,26 +40,28 @@ const rootCssClass = computed(() => {
     cssClass = `${cssClass} border-transparent border-opacity-0`
   }
 
-  if (props.noShadow) {
+  if (!!props.noShadow) {
     cssClass = `${cssClass} no-shadow`
   }
 
-  if (props.noPadding) {
+  if (!!props.noPadding) {
     cssClass = `${cssClass} no-padding p-0`
   }
 
   if ((props.backgroundCssClasses || '').trim().length > 0) {
-    cssClass = `${cssClass} ${props.backgroundCssClasses}`
+    cssClass = `${cssClass} ${props.backgroundCssClasses}`.trim()
   } else {
     cssClass = `${cssClass} bg-card content-card`
   }
 
-  if (['large', 'xlarge'].indexOf(props.size || '') > -1) {
-    cssClass = `${cssClass} ${props.size}-widget`
+  if ((props.addCssClasses || '').trim().length > 0) {
+    cssClass = `${cssClass} ${props.addCssClasses}`.trim()
   }
 
-  return getDistinctCssClasses(cssClass)
-})
+  return cssClass
+}
+
+const rootCssClass = computed(() => getDistinctCssClasses(_getCssClasses()))
 
 const widgetHeaderCssClass = computed(() => {
   const hideTitle = computedHideTitle.value
