@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import {
-  IDashboardSettingEntry,
-  getDistinctCssClasses,
-  dashboardSettingsUtils,
-} from '@tenorlab/dashboard-core'
-import { TextField } from '../dashboard-primitives'
+import type { IDashboardSettingEntry } from '@tenorlab/dashboard-core'
+import { getDistinctCssClasses, dashboardSettingsUtils } from '@tenorlab/dashboard-core'
+import { Button, TextField, PlusCircleIcon, MinusCircleIcon } from '../dashboard-primitives'
 
 type TSettingListItemProps = {
   item: IDashboardSettingEntry
@@ -20,7 +17,7 @@ const displayName = props.item.name || 'Unknown'
 const description = props.item.description || '---'
 
 const className = getDistinctCssClasses(`
-  flex flex-row gap-2 p-2 rounded-md border text-sm bg-card content-card backdrop-opacity-100
+  flex flex-row gap-2 px-2 text-sm backdrop-opacity-100
 `)
 
 // Handler for emitting the updated item whenever the TextField value changes
@@ -33,9 +30,9 @@ const onInputChange = (value: string) => {
 }
 
 // Handler for keyboard events (ArrowUp/ArrowDown)
-const onKeyIncrement = (step: 1 | -1) => {
+const incrementOrDecrement = (direction: 1 | -1) => {
   // increment/decrement entry value
-  const updatedEntry = dashboardSettingsUtils.incrementOrDecrementValue(props.item, step)
+  const updatedEntry = dashboardSettingsUtils.incrementOrDecrementValue(props.item, direction)
   // Emit the updated entry
   emits('settingChanged', updatedEntry)
 }
@@ -43,24 +40,41 @@ const onKeyIncrement = (step: 1 | -1) => {
 
 <template>
   <div :class="className" style="width: calc(100% - 1rem)">
-    <div class="w-full">
-      <div class="flex flex-row items-center gap-2 justify-between">
-        <span class="font-bold">{{ displayName }}</span>
-      </div>
-      <div class="flex flex-col gap-2 text-xs">
-        <div>{{ description }}</div>
-      </div>
-      <div>
-        Value:
+    <div class="w-full flex flex-col">
+      <h6 class="font-bold">{{ displayName }}</h6>
+      <p class="flex flex-col text-xs">{{ description }}</p>
+      <div class="mt-1 flex flex-row gap-2 items-center">
         <TextField
-          label="Filter..."
+          label=""
           size="small"
           class="w-full"
           :modelValue="item.value"
           @update:modelValue="onInputChange"
-          @keydown.up.prevent="onKeyIncrement(1)"
-          @keydown.down.prevent="onKeyIncrement(-1)"
+          @keydown.up.prevent="incrementOrDecrement(1)"
+          @keydown.down.prevent="incrementOrDecrement(-1)"
         />
+        <Button
+          :data-testid="`setting-decrease_${item.key}`"
+          :isIconButton="true"
+          :tooltip="{
+            placement: 'top',
+            title: 'Decrease Value',
+          }"
+          @click="() => incrementOrDecrement(-1)"
+        >
+          <MinusCircleIcon />
+        </Button>
+        <Button
+          :data-testid="`setting-increase_${item.key}`"
+          :isIconButton="true"
+          :tooltip="{
+            placement: 'top',
+            title: 'Increase Value',
+          }"
+          @click="() => incrementOrDecrement(1)"
+        >
+          <PlusCircleIcon />
+        </Button>
       </div>
     </div>
   </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TSvgIconProps } from './interfaces'
+import type { TSvgIconProps } from './interfaces'
 defineProps<TSvgIconProps>()
 </script>
 <template>

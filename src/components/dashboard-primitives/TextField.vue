@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ITextFieldProps } from './interfaces'
+import type { ITextFieldProps } from './interfaces'
 
 const props = withDefaults(defineProps<ITextFieldProps>(), {
   size: 'medium',
@@ -43,8 +43,7 @@ const sizeClasses = computed(() => {
 
 // Base styles for the outer div
 const cssClasses = computed(() => {
-  // Equivalent to getDistinctCssClasses(`flex flex-col mb-4`, className)
-  return `flex flex-col mb-4 ${props.className}`
+  return `flex flex-col gap-1 ${props.className}`
 })
 
 // Base styles for the input element
@@ -64,7 +63,7 @@ const inputClasses = computed(() => {
 
 <template>
   <div :class="cssClasses">
-    <label :for="props.label" class="block text-sm/6 font-medium mb-1.5">
+    <label :for="props.label" class="block text-sm/6 font-medium">
       {{ props.label }}
     </label>
     <input

@@ -13,9 +13,8 @@ defineProps<TSvgIconProps>()
     stroke-width="2"
     stroke-linecap="round"
     stroke-linejoin="round"
-    :class="`lucide lucide-redo-icon lucide-redo ${cssClass || ''}`.trim()"
+    :class="`lucide lucide-chevron-down-icon lucide-chevron-down ${cssClass || ''}`.trim()"
   >
-    <path d="M21 7v6h-6" />
-    <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7" />
+    <path d="m6 9 6 6 6-6" />
   </svg>
 </template>

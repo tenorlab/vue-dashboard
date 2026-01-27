@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { IButtonProps } from './interfaces'
 import { getDistinctCssClasses } from '@tenorlab/dashboard-core'
+import type { IButtonProps } from './interfaces'
 
 const props = withDefaults(defineProps<IButtonProps>(), {
   disabled: false,

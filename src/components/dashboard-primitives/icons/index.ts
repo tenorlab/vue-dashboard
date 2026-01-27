@@ -1,6 +1,8 @@
 // @tenorlab/vue-dashboard
 // file: src/components/dashboard-primitives/icons/index.ts
-export { default as AddIcon } from './AddIcon.vue'
+export { default as PlusCircleIcon } from './PlusCircleIcon.vue'
+export { default as MinusCircleIcon } from './MinusCircleIcon.vue'
+export { default as AddIcon } from './PlusCircleIcon.vue'
 export { default as DeleteIcon } from './DeleteIcon.vue'
 export { default as EditIcon } from './EditIcon.vue'
 export { default as RenameIcon } from './RenameIcon.vue'
@@ -22,3 +24,4 @@ export { default as HandGrabIcon } from './HandGrabIcon.vue'
 export { default as CrosshairIcon } from './CrosshairIcon.vue'
 export { default as TargetIcon } from './TargetIcon.vue'
 export { default as CircleQuestionMarkIcon } from './CircleQuestionMarkIcon.vue'
+export { default as ChevronDownIcon } from './ChevronDownIcon.vue'

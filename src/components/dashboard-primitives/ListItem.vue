@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import Stack, { TStackProps } from './Stack.vue'
 import { getDistinctCssClasses } from '@tenorlab/dashboard-core'
+import Stack from './Stack.vue'
+import type { TStackProps } from './Stack.vue'
 
 const props = defineProps<TStackProps & { innerClass?: string }>()
 

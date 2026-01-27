@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TSvgIconProps } from './interfaces'
+import type { TSvgIconProps } from './interfaces'
 defineProps<TSvgIconProps>()
 </script>
 <template>
@@ -13,10 +13,9 @@ defineProps<TSvgIconProps>()
     stroke-width="2"
     stroke-linecap="round"
     stroke-linejoin="round"
-    :class="`lucide lucide-circle-plus-icon lucide-circle-plus ${cssClass || ''}`.trim()"
+    :class="`lucide lucide-circle-minus-icon lucide-circle-minus ${cssClass || ''}`.trim()"
   >
     <circle cx="12" cy="12" r="10" />
     <path d="M8 12h8" />
-    <path d="M12 8v8" />
   </svg>
 </template>

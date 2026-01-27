@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, markRaw } from 'vue'
 
 import {
   getWidgetMetaFromCatalog,
-  // dashboardSettingsUtils,
   getDistinctCssClasses,
   parseContainerTitle,
 } from '@tenorlab/dashboard-core'
@@ -12,12 +11,13 @@ import {
   HandGrabIcon,
   TimerResetIcon as ResetDashboardToDefaultIcon,
   SettingsIcon,
+  ChevronDownIcon,
   UndoIcon,
   RedoIcon,
-  // CircleQuestionMark as UnknownWidgetIcon,
   Button,
   DraggablePanel,
   TextField,
+  Dropdown,
 } from '../dashboard-primitives/'
 import type {
   IDashboardConfig,
@@ -30,6 +30,13 @@ import type { TDashboardWidgetCatalog } from '../interfaces/'
 
 import WidgetListItem from './WidgetListItem.vue'
 import SettingListItem from './SettingListItem.vue'
+
+type TTabInfo = {
+  id: number
+  label: string
+  hideLabel?: boolean
+  icon?: any
+}
 
 export type TWidgetsCatalogFlyoutProps = {
   targetContainerKey?: TDashboardWidgetKey
@@ -63,6 +70,7 @@ const title = ref<string>('Editing')
 const tabValue = ref(0)
 const searchText = ref('')
 const isDragging = ref(false)
+const isTabsMenuOpen = ref(false)
 
 // Get the array of available widget keys from the Map
 const widgetKeys = computed<TDashboardWidgetKey[]>(() => Array.from(props.widgetsCatalog.keys()))
@@ -98,6 +106,39 @@ const containerWidgetsWithMeta = computed<TWidgetWithMeta[]>(() => {
 })
 
 const isTargetingContainer = computed(() => !!props.targetContainerKey)
+const getIsTargetingContainer = () => isTargetingContainer.value
+
+const tabs = computed((): TTabInfo[] => {
+  const results: TTabInfo[] = [
+    {
+      id: 0,
+      label: 'Widgets',
+    },
+    {
+      id: 1,
+      label: 'Charts',
+    },
+  ]
+
+  if (!getIsTargetingContainer()) {
+    results.push({
+      id: 2,
+      label: 'Containers',
+    })
+    results.push({
+      id: 3,
+      label: 'CSS Settings',
+      hideLabel: true,
+      icon: markRaw(SettingsIcon),
+    })
+  }
+
+  return results
+})
+
+const currentCategory = computed((): string => {
+  return tabs.value.find((x) => x.id === tabValue.value)?.label || 'Category...'
+})
 
 // --- Methods ---
 
@@ -115,7 +156,8 @@ const matchSearchTextForWidget = (metaData: TWidgetMetaInfoBase): boolean => {
   }
   return (
     metaData.name.trim().toLowerCase().includes(lowerCaseText) ||
-    metaData.description.toLowerCase().includes(lowerCaseText)
+    metaData.description.toLowerCase().includes(lowerCaseText) ||
+    metaData.categories.some((c) => c.toLowerCase().includes(lowerCaseText))
   )
 }
 
@@ -130,16 +172,26 @@ const matchSearchTextForSetting = (item: IDashboardSettingEntry): boolean => {
   )
 }
 
-const getTabClassName = (tabNum: number) => {
+const getTabClassName = (tabNum: number, noBorderBottom?: boolean) => {
   return getDistinctCssClasses(
-    'px-4 py-2 font-medium cursor-pointer border-b-2 border-transparent hover:border-primary focus:outline-none',
+    'px-4 py-2 font-medium cursor-pointer',
+    `${!noBorderBottom ? 'border-b-2' : ''} border-transparent hover:border-primary focus:outline-none`,
     tabNum === tabValue.value ? 'text-primary border-primary' : '',
+  )
+}
+
+const getMobileTabClassName = (tabNum: number) => {
+  return getDistinctCssClasses(
+    `w-full flex items-center gap-2 px-2 py-1 text-left text-sm cursor-pointer border`,
+    tabNum !== tabValue.value
+      ? `border-transparent content-topbar hover:bg-primary hover:content-primary`
+      : 'border-primary text-primary',
   )
 }
 
 // Handler for when WidgetListItem emits 'addWidget'
 const onAddWidgetClick = (widgetKey: TDashboardWidgetKey) => {
-  if (!isTargetingContainer.value) {
+  if (!getIsTargetingContainer()) {
     // targeting dashboard
     props.addWidget(widgetKey)
   } else {
@@ -159,6 +211,14 @@ const onSettingItemChanged = (item: IDashboardSettingEntry) => {
   props.onSettingItemsUpdated(updatedItems)
 }
 
+const handleToggleTabsOpen = (value: boolean) => {
+  isTabsMenuOpen.value = value
+}
+const handleTabClick = (value: number) => {
+  tabValue.value = value
+  isTabsMenuOpen.value = false
+}
+
 const onDraggingChange = (value: boolean) => {
   isDragging.value = value
 }
@@ -167,11 +227,11 @@ watch(
   () => props.targetContainerKey,
   (newKey) => {
     if (!!newKey) {
-      tabValue.value = 0
+      handleTabClick(0)
       const containerTitle = parseContainerTitle(newKey)
       title.value = `Editing ${containerTitle}`
     } else {
-      title.value = 'Editing Dashboard'
+      title.value = 'Widget Catalog'
     }
   },
   { immediate: true },
@@ -181,13 +241,9 @@ watch(
 <template>
   <DraggablePanel
     testId="dashboard-catalog-flyout"
-    className="bg-body content-body bg-opacity-70 border-2 border-primary"
-    :zIndex="zIndex"
+    :className="`transition-colors duration-150 bg-body content-body bg-opacity-70 border-2 ${!isDragging ? 'border-primary' : 'border-warning'} max-w-72 sm:max-w-90`"
+    :zIndex="zIndex || 99999"
     :style="{
-      width: '360px',
-      minWidth: '360px',
-      maxWidth: '360px',
-      minHeight: '360px',
       backdropFilter: 'blur(8px)',
     }"
     @draggingChange="onDraggingChange"
@@ -195,7 +251,9 @@ watch(
     <div class="flex flex-col gap-2 p-2">
       <div class="flex flex-row gap-2 justify-between">
         <!-- Drag Handle -->
-        <div class="handle flex-1 flex gap-2 w-full hover:text-primary cursor-grab">
+        <div
+          :class="`handle cursor-grab flex-1 flex gap-2 w-full ${!isDragging ? 'hover:text-primary' : 'text-warning'}`"
+        >
           <HandGrabIcon v-if="isDragging" class="size-5" />
           <HandIcon v-else class="size-5" />
           <h2
@@ -250,22 +308,56 @@ watch(
         </div>
       </div>
 
-      <!-- Tabs -->
-      <div class="flex border-b border-gray-200">
-        <button @click="tabValue = 0" :class="getTabClassName(0)">Widgets</button>
-        <button @click="tabValue = 1" :class="getTabClassName(1)">Charts</button>
-        <button v-if="!isTargetingContainer" @click="tabValue = 2" :class="getTabClassName(2)">
-          Containers
+      <!-- tabs -->
+      <div class="hidden sm:flex sm:flex-row sm:items-center sm:gap-1">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          :class="getTabClassName(tab.id, tab.id === 3)"
+          @click="() => handleTabClick(tab.id)"
+        >
+          <span :class="tab.hideLabel ? 'sr-only' : ''">{{ tab.label }}</span>
+          <component v-if="tab.icon" :is="tab.icon" />
         </button>
-        <button v-if="!isTargetingContainer" @click="tabValue = 3" :class="getTabClassName(3)">
-          <SettingsIcon />
-        </button>
+      </div>
+      <!-- tabs mobile -->
+      <div class="flex flex-col gap-1 sm:hidden">
+        <Dropdown
+          :enabled="true"
+          :showChevron="true"
+          :isMenuOpen="isTabsMenuOpen"
+          @toggleOpen="handleToggleTabsOpen"
+        >
+          <template #icon>
+            <div
+              class="group flex items-center gap-2 text-primary group-hover:text-primary-inverse"
+            >
+              <h5 class="py-2 font-bold">{{ currentCategory }}</h5>
+              <ChevronDownIcon class="shrink-0 ml-1 size-4" />
+            </div>
+          </template>
+          <div class="p-2 rounded-md border border-primary">
+            <h6 class="font-semibold">Category:</h6>
+            <button
+              v-for="tab in tabs"
+              :key="tab.id"
+              type="button"
+              :class="getMobileTabClassName(tab.id)"
+              role="menuitem"
+              :tabIndex="-1"
+              @click="() => handleTabClick(tab.id)"
+            >
+              <span>{{ tab.label }}</span>
+            </button>
+          </div>
+        </Dropdown>
       </div>
 
       <!-- Search Filter -->
-      <div class="flex items-center justify-between gap-1 w-full">
+      <div className="sm:mt-2 flex flex-col gap-1 w-full">
         <TextField
-          label="Filter..."
+          label=""
+          placeholder="Find..."
           size="small"
           class="w-full"
           v-model="searchText"
@@ -275,6 +367,10 @@ watch(
 
       <!-- Content Area -->
       <div class="flex flex-col gap-2 overflow-x-hidden overflow-y-auto" style="max-height: 360px">
+        <div v-if="tabValue === 3" className="hidden px-2 w-full font-semibold sm:flex">
+          {{ currentCategory }}:
+        </div>
+
         <!-- Tab 0: Widgets -->
         <template v-if="tabValue === 0">
           <WidgetListItem

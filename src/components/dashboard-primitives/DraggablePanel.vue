@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, CSSProperties, VNodeRef } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import type { CSSProperties } from 'vue'
 
 // --- Interface Definitions ---
 
@@ -21,7 +22,7 @@ const emits = defineEmits<{
 // --- State and Refs ---
 
 // Ref to the root HTML element of the panel
-const panelRef = ref<VNodeRef | null>(null)
+const panelRef = ref<HTMLElement | null>(null)
 
 // State to track the panel's position, initialized based on default floating styles
 const position = ref({ x: 0, y: 0 })
@@ -66,35 +67,55 @@ const mergedStyles = computed(() => {
   }
 })
 
-// --- Drag Handlers (Manual Implementation) ---
+// --- Drag Handlers (Unified Mouse & Touch Implementation) ---
 
-// 1. Mouse Down (Start Drag)
-const handleMouseDown = (e: MouseEvent) => {
+// Helper to extract coordinates regardless of event type
+const getCoords = (e: MouseEvent | TouchEvent) => {
+  if ('touches' in e && e.touches.length > 0) {
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }
+  return { x: (e as MouseEvent).clientX, y: (e as MouseEvent).clientY }
+}
+
+// 1. Start Drag (Handles both mousedown and touchstart)
+const handleStart = (e: MouseEvent | TouchEvent) => {
   const target = e.target as HTMLElement
-  // Check if the mousedown event occurred on the designated handle element
+  // Check if the event occurred on the designated handle element
   if (!target.closest('.handle')) {
     return
   }
 
-  e.preventDefault() // Prevent selection
+  // Prevent default behavior (scrolling on touch, selection on mouse)
+  if (e.cancelable) e.preventDefault()
 
   // Notify parent dragging started
   emits('draggingChange', true)
 
   // Record initial positions
-  dragStart.value = { x: e.clientX, y: e.clientY }
+  const coords = getCoords(e)
+  dragStart.value = { x: coords.x, y: coords.y }
   panelStart.value = { x: position.value.x, y: position.value.y }
 
   // Attach global listeners for movement and release
-  window.addEventListener('mousemove', handleMouseMove)
-  window.addEventListener('mouseup', handleMouseUp)
+  window.addEventListener('mousemove', handleMove)
+  window.addEventListener('mouseup', handleEnd)
+
+  // For touch, we use { passive: false } to allow e.preventDefault() during move
+  window.addEventListener('touchmove', handleMove, { passive: false })
+  window.addEventListener('touchend', handleEnd)
+  window.addEventListener('touchcancel', handleEnd)
 }
 
-// 2. Mouse Move (During Drag)
-const handleMouseMove = (e: MouseEvent) => {
-  // Calculate the difference in mouse position since drag started
-  const dx = e.clientX - dragStart.value.x
-  const dy = e.clientY - dragStart.value.y
+// 2. Move (During Drag)
+const handleMove = (e: MouseEvent | TouchEvent) => {
+  // Prevent background scrolling while dragging on mobile
+  if (e.cancelable) e.preventDefault()
+
+  const coords = getCoords(e)
+
+  // Calculate the difference in position since drag started
+  const dx = coords.x - dragStart.value.x
+  const dy = coords.y - dragStart.value.y
 
   // Update the new panel position relative to the starting position
   position.value = {
@@ -103,11 +124,14 @@ const handleMouseMove = (e: MouseEvent) => {
   }
 }
 
-// 3. Mouse Up (End Drag)
-const handleMouseUp = () => {
+// 3. End Drag (Clean up all listeners)
+const handleEnd = () => {
   // Clean up global listeners
-  window.removeEventListener('mousemove', handleMouseMove)
-  window.removeEventListener('mouseup', handleMouseUp)
+  window.removeEventListener('mousemove', handleMove)
+  window.removeEventListener('mouseup', handleEnd)
+  window.removeEventListener('touchmove', handleMove)
+  window.removeEventListener('touchend', handleEnd)
+  window.removeEventListener('touchcancel', handleEnd)
 
   // Notify parent dragging stopped (with a slight delay)
   setTimeout(() => {
@@ -117,20 +141,26 @@ const handleMouseUp = () => {
 
 // Lifecycle events
 onMounted(() => {
-  // Attach the mousedown listener to the panel element when mounted
+  // Attach both mousedown and touchstart listeners
   if (panelRef.value) {
-    panelRef.value.addEventListener('mousedown', handleMouseDown)
+    panelRef.value.addEventListener('mousedown', handleStart)
+    panelRef.value.addEventListener('touchstart', handleStart, { passive: false })
   }
 })
 
 onUnmounted(() => {
-  // Clean up the mousedown listener when component is destroyed
+  // Clean up the initial listeners
   if (panelRef.value) {
-    panelRef.value.removeEventListener('mousedown', handleMouseDown)
+    panelRef.value.removeEventListener('mousedown', handleStart)
+    panelRef.value.removeEventListener('touchstart', handleStart)
   }
-  // Also ensure global listeners are removed in case of sudden unmount
-  window.removeEventListener('mousemove', handleMouseMove)
-  window.removeEventListener('mouseup', handleMouseUp)
+
+  // Ensure global listeners are removed
+  window.removeEventListener('mousemove', handleMove)
+  window.removeEventListener('mouseup', handleEnd)
+  window.removeEventListener('touchmove', handleMove)
+  window.removeEventListener('touchend', handleEnd)
+  window.removeEventListener('touchcancel', handleEnd)
 })
 </script>
 
