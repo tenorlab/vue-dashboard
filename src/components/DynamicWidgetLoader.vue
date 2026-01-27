@@ -11,6 +11,7 @@ import type {
   IDynamicWidgetCatalogEntry,
   TWidgetErrorExtraProps,
 } from './interfaces'
+import { SpinnerComponent } from './dashboard-primitives'
 
 // Add this helper function at the top of your script setup or in a shared utils file
 const isVersionCompatible = (hostVer: string, widgetVer: string): boolean => {
@@ -272,9 +273,7 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
       <div
         class="relative min-h-12 flex flex-col items-center justify-center bg-base-200 rounded-lg"
       >
-        <div class="z-10 text-primary font-bold mb-4">
-          Loading {{ catalogEntry?.title || 'Widget' }}
-        </div>
+        <SpinnerComponent :title="`Loading ${catalogEntry?.title || 'Widget'}`" />
         <div
           class="animate-ping absolute h-24 w-24 rounded-full border-4 border-primary opacity-20"
         ></div>
