@@ -8,6 +8,7 @@ export { default as Dropdown } from './Dropdown.vue'
 export { default as Stack } from './Stack.vue'
 export { default as ListItem } from './ListItem.vue'
 export { default as DraggablePanel } from './DraggablePanel.vue'
+export { default as SpinnerComponent } from './Spinner.vue'
 export * from './wrappers'
 
 export const showToast = (options: any) => {
