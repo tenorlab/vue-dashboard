@@ -91,10 +91,12 @@ const onMoveClick = (direction: -1 | 1) => {
   <div :class="rootCssClass">
     <div :class="widgetHeaderCssClass">
       <div class="widget-title-wrapper w-full flex flex-row gap-2 items-center justify-between">
-        <h2 class="widget-title">
-          {{ props.title }}
-        </h2>
-        <div></div>
+        <slot name="title">
+          <h2 class="widget-title">
+            {{ props.title }}
+          </h2>
+        </slot>
+        <slot name="title-right"></slot>
       </div>
 
       <div data-testid="collapse-and-other-actions">
