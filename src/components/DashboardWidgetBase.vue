@@ -1,7 +1,14 @@
 <script setup lang="ts">
 // file: src/dashboard-components/DashboardWidgetBase.vue
 import { ref, computed } from 'vue'
-import { Button, MoveLeftIcon, MoveRightIcon, XCircleIcon as RemoveWidgetIcon } from './dashboard-primitives/'
+import {
+  Button,
+  MoveLeftIcon,
+  MoveRightIcon,
+  XCircleIcon as RemoveWidgetIcon,
+  ChevronDownIcon,
+  HandGrabIcon,
+} from './dashboard-primitives/'
 import { getDistinctCssClasses } from '@tenorlab/dashboard-core'
 import type { IDashboardWidgetProps, TWidgetEmits } from './interfaces'
 
