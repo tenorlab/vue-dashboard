@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<IDashboardWidgetProps>(), {
 })
 
 const _emits = defineEmits<TWidgetEmits>()
-const { removeClick, moveClick, selectContainer } = useWidgetEmits(_emits)
+const emitHandlers = useWidgetEmits(_emits)
 
 const rest = computed(() => {
   const { direction: _0, ...rest } = props
@@ -24,13 +24,7 @@ const rest = computed(() => {
 })
 </script>
 <template>
-  <WidgetContainer
-    direction="row"
-    v-bind="rest"
-    @removeClick="removeClick"
-    @moveClick="moveClick"
-    @selectContainer="selectContainer"
-  >
+  <WidgetContainer direction="row" v-bind="rest" v-on="emitHandlers">
     <slot></slot>
   </WidgetContainer>
 </template>

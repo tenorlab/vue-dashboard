@@ -231,6 +231,7 @@ const getWidgetSavedProps = (
             :extraProps="extraProps"
             @removeClick="onRemoveClick"
             @moveClick="onMoveClick"
+            @savedPropsChanged="onSavedPropsChanged"
           />
         </template>
       </component>
