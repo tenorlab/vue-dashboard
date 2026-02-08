@@ -1,27 +1,17 @@
 <script setup lang="ts">
-import type { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 import type { IDashboardWidgetProps, TWidgetEmits, TWidgetErrorExtraProps } from './interfaces'
 import DashboardWidgetBase from './DashboardWidgetBase.vue'
 import { useWidgetEmits } from './use-widget-emits'
 import { computed } from 'vue'
 
 const props = defineProps<IDashboardWidgetProps>()
-const emits = defineEmits<TWidgetEmits>()
-const { removeClick: onRemoveClick, moveClick: onMoveClick } = useWidgetEmits(emits)
+const _emits = defineEmits<TWidgetEmits>()
+const emitHandlers = useWidgetEmits(_emits)
 const extraProps = computed<TWidgetErrorExtraProps>(() => props.extraProps)
 </script>
 
 <template>
-  <DashboardWidgetBase
-    :widgetKey="widgetKey"
-    title="Widget Error"
-    :parentWidgetKey="parentWidgetKey"
-    :index="index"
-    :maxIndex="maxIndex"
-    :isEditing="isEditing"
-    @removeClick="onRemoveClick"
-    @moveClick="onMoveClick"
-  >
+  <DashboardWidgetBase v-bind="props" v-on="emitHandlers" title="Widget Error">
     <div class="p-4 border border-dashed border-danger">
       <span class="font-bold">Failed to load "{{ widgetKey }}"</span>
       <div v-if="extraProps?.versionMismatch" class="flex flex-col">
