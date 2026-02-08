@@ -1,6 +1,6 @@
 // @tenorlab/vue-dashboard
 // file: src/components/interfaces/vue-specific.ts
-import { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
+import type { IWidgetSavedProps, TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 
 // vue specific
 /**
@@ -21,4 +21,5 @@ export type TWidgetEmits = {
     parentWidgetKey?: TDashboardWidgetKey,
   ): void
   (event: 'selectContainer', containerKey?: TDashboardWidgetKey): void
+  (event: 'savedPropsChanged', savedProps: IWidgetSavedProps): void
 }
