@@ -10,7 +10,7 @@ import {
 } from './dashboard-primitives'
 import { getDistinctCssClasses } from '@tenorlab/dashboard-core'
 import { useWidgetEmits } from './use-widget-emits'
-import { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
+import type { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 import type { IDashboardWidgetProps, TWidgetEmits } from './interfaces/'
 
 const props = withDefaults(defineProps<IDashboardWidgetProps>(), {
@@ -142,8 +142,7 @@ const selectContainer = () => {
               :disabled="props.index < 1"
               :tooltip="{
                 placement: 'top',
-                title:
-                  props.index < 1 ? 'Already at min position' : 'Move Container to the left/up',
+                title: props.index < 1 ? 'Already at min position' : 'Move Container to the left/up',
               }"
               @click.stop="onMoveClick(-1)"
             >

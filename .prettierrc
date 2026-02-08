@@ -3,7 +3,7 @@
   "useTabs": false,
   "semi": false,
   "singleQuote": true,
-  "printWidth": 100,
+  "printWidth": 110,
   "vueIndentScriptAndStyle": false,
   "trailingComma": "all",
   "bracketSpacing": true,

@@ -1,6 +1,6 @@
 // @tenorlab/vue-dashboard
 // file: src/components/interfaces/vue-specific.ts
-import { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
+import type { IWidgetSavedProps, TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 
 // vue specific
 /**
@@ -9,11 +9,7 @@ import { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
  * @interface TWidgetEmits
  */
 export type TWidgetEmits = {
-  (
-    event: 'removeClick',
-    widgetKey: TDashboardWidgetKey,
-    parentWidgetKey?: TDashboardWidgetKey,
-  ): void
+  (event: 'removeClick', widgetKey: TDashboardWidgetKey, parentWidgetKey?: TDashboardWidgetKey): void
   (
     event: 'moveClick',
     direction: -1 | 1,
@@ -21,4 +17,5 @@ export type TWidgetEmits = {
     parentWidgetKey?: TDashboardWidgetKey,
   ): void
   (event: 'selectContainer', containerKey?: TDashboardWidgetKey): void
+  (event: 'savedPropsChanged', savedProps: IWidgetSavedProps): void
 }

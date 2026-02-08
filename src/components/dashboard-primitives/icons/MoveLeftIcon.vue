@@ -13,9 +13,7 @@ defineProps<TSvgIconProps>()
     stroke-width="2"
     stroke-linecap="round"
     stroke-linejoin="round"
-    :class="
-      `lucide lucide-circle-arrow-left-icon lucide-circle-arrow-left ${cssClass || ''}`.trim()
-    "
+    :class="`lucide lucide-circle-arrow-left-icon lucide-circle-arrow-left ${cssClass || ''}`.trim()"
   >
     <circle cx="12" cy="12" r="10" />
     <path d="m12 8-4 4 4 4" />

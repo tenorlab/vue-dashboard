@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import WidgetContainer from './WidgetContainer.vue'
 import { useWidgetEmits } from './use-widget-emits'
-import { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
+import type { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 import type { IDashboardWidgetProps, TWidgetEmits } from './interfaces/'
 
 const props = withDefaults(defineProps<IDashboardWidgetProps>(), {

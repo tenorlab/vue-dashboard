@@ -13,7 +13,7 @@ const extraProps = computed<TWidgetErrorExtraProps>(() => props.extraProps)
 
 <template>
   <DashboardWidgetBase
-    :widgetKey="props.widgetKey"
+    :widgetKey="widgetKey"
     title="Widget Error"
     :parentWidgetKey="parentWidgetKey"
     :index="index"
@@ -33,9 +33,7 @@ const extraProps = computed<TWidgetErrorExtraProps>(() => props.extraProps)
         <div class="flex flex-col mt-3">
           <h5>Externals:</h5>
           <dl class="ml-2 flex flex-col text-xs">
-            <dd v-for="(dep, i) in extraProps?.externalDependencies" :key="`dep-${i}`">
-              - {{ dep }}
-            </dd>
+            <dd v-for="(dep, i) in extraProps?.externalDependencies" :key="`dep-${i}`">- {{ dep }}</dd>
           </dl>
         </div>
       </div>
