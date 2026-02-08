@@ -13,9 +13,7 @@ defineProps<TSvgIconProps>()
     stroke-width="2"
     stroke-linecap="round"
     stroke-linejoin="round"
-    :class="
-      `lucide lucide-text-cursor-input-icon lucide-text-cursor-input ${cssClass || ''}`.trim()
-    "
+    :class="`lucide lucide-text-cursor-input-icon lucide-text-cursor-input ${cssClass || ''}`.trim()"
   >
     <path d="M12 20h-1a2 2 0 0 1-2-2 2 2 0 0 1-2 2H6" />
     <path d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7" />

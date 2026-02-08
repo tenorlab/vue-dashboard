@@ -44,9 +44,7 @@ export interface IDashboardGridProps extends IDashboardGridPropsBase {}
  * @template TExtraProps - Additional properties to be included in the widget props.
  * @interface IDashboardWidgetProps
  */
-export interface IDashboardWidgetProps<
-  TExtraProps = any,
-> extends IDashboardWidgetPropsBase<TExtraProps> {}
+export interface IDashboardWidgetProps<TExtraProps = any> extends IDashboardWidgetPropsBase<TExtraProps> {}
 
 /**
  * @name IDashboardWidget

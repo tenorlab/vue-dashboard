@@ -1,11 +1,7 @@
 // @tenorlab/vue-dashboard
 // file: src/components/use-dashboard-undo-service.ts
 import { reactive, computed, readonly } from 'vue'
-import type {
-  IDashboardConfig,
-  TUndoHistoryEntry,
-  TDashboardUndoStatus,
-} from '@tenorlab/dashboard-core'
+import type { IDashboardConfig, TUndoHistoryEntry, TDashboardUndoStatus } from '@tenorlab/dashboard-core'
 
 /**
  * @name TState

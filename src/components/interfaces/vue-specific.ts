@@ -9,11 +9,7 @@ import type { IWidgetSavedProps, TDashboardWidgetKey } from '@tenorlab/dashboard
  * @interface TWidgetEmits
  */
 export type TWidgetEmits = {
-  (
-    event: 'removeClick',
-    widgetKey: TDashboardWidgetKey,
-    parentWidgetKey?: TDashboardWidgetKey,
-  ): void
+  (event: 'removeClick', widgetKey: TDashboardWidgetKey, parentWidgetKey?: TDashboardWidgetKey): void
   (
     event: 'moveClick',
     direction: -1 | 1,

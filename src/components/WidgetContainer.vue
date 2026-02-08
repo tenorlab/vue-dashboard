@@ -142,8 +142,7 @@ const selectContainer = () => {
               :disabled="props.index < 1"
               :tooltip="{
                 placement: 'top',
-                title:
-                  props.index < 1 ? 'Already at min position' : 'Move Container to the left/up',
+                title: props.index < 1 ? 'Already at min position' : 'Move Container to the left/up',
               }"
               @click.stop="onMoveClick(-1)"
             >

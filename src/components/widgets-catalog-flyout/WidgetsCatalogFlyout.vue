@@ -54,10 +54,7 @@ export type TWidgetsCatalogFlyoutProps = {
 
 const props = defineProps<TWidgetsCatalogFlyoutProps>()
 
-const isWidgetAlreadyAdded = (
-  widgetKey: TDashboardWidgetKey,
-  dashboardConfig: IDashboardConfig,
-) => {
+const isWidgetAlreadyAdded = (widgetKey: TDashboardWidgetKey, dashboardConfig: IDashboardConfig) => {
   const allExistingWidgets = [
     ...dashboardConfig.widgets.filter((x) => x.indexOf('Container') === -1),
     ...dashboardConfig.childWidgetsConfig.map((x) => x.widgetKey),
@@ -89,8 +86,7 @@ const unfilteredWidgetsWithMeta = computed<TWidgetWithMeta[]>(() => {
 
 const widgetsWithMeta = computed<TWidgetWithMeta[]>(() => {
   return unfilteredWidgetsWithMeta.value.filter(
-    (item) =>
-      item.metaData.categories.includes('Widget') && matchSearchTextForWidget(item.metaData),
+    (item) => item.metaData.categories.includes('Widget') && matchSearchTextForWidget(item.metaData),
   )
 })
 const chartWidgetsWithMeta = computed<TWidgetWithMeta[]>(() => {
@@ -100,8 +96,7 @@ const chartWidgetsWithMeta = computed<TWidgetWithMeta[]>(() => {
 })
 const containerWidgetsWithMeta = computed<TWidgetWithMeta[]>(() => {
   return unfilteredWidgetsWithMeta.value.filter(
-    (item) =>
-      item.metaData.categories.includes('Container') && matchSearchTextForWidget(item.metaData),
+    (item) => item.metaData.categories.includes('Container') && matchSearchTextForWidget(item.metaData),
   )
 })
 
@@ -259,9 +254,7 @@ watch(
           <h2
             class="flex-1 text-base margin-0 capitalize"
             :title="
-              isTargetingContainer
-                ? title
-                : `Editing dashboard: ${currentDashboardConfig.dashboardName}`
+              isTargetingContainer ? title : `Editing dashboard: ${currentDashboardConfig.dashboardName}`
             "
           >
             {{ title }}
@@ -329,9 +322,7 @@ watch(
           @toggleOpen="handleToggleTabsOpen"
         >
           <template #icon>
-            <div
-              class="group flex items-center gap-2 text-primary group-hover:text-primary-inverse"
-            >
+            <div class="group flex items-center gap-2 text-primary group-hover:text-primary-inverse">
               <h5 class="py-2 font-bold">{{ currentCategory }}</h5>
               <ChevronDownIcon class="shrink-0 ml-1 size-4" />
             </div>
@@ -410,9 +401,7 @@ watch(
         <!-- Tab 3: Settings -->
         <template v-else-if="tabValue === 3 && !isTargetingContainer">
           <SettingListItem
-            v-for="item in (currentDashboardConfig.cssSettings || []).filter(
-              matchSearchTextForSetting,
-            )"
+            v-for="item in (currentDashboardConfig.cssSettings || []).filter(matchSearchTextForSetting)"
             :key="item.key"
             :item="item"
             @settingChanged="onSettingItemChanged"
