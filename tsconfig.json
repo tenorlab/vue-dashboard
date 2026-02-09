@@ -14,6 +14,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
     "baseUrl": ".",
     "paths": {
       "@/*": [

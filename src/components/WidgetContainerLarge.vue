@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import WidgetContainer from './WidgetContainer.vue'
 import { useWidgetEmits } from './use-widget-emits'
-import { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
+import type { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 import type { IDashboardWidgetProps, TWidgetEmits } from './interfaces/'
 
 const props = withDefaults(defineProps<IDashboardWidgetProps>(), {
@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<IDashboardWidgetProps>(), {
 })
 
 const _emits = defineEmits<TWidgetEmits>()
-const { removeClick, moveClick, selectContainer } = useWidgetEmits(_emits)
+const emitHandlers = useWidgetEmits(_emits)
 
 const rest = computed(() => {
   const { size: _0, ...rest } = props
@@ -24,13 +24,7 @@ const rest = computed(() => {
 })
 </script>
 <template>
-  <WidgetContainer
-    size="large"
-    v-bind="rest"
-    @removeClick="removeClick"
-    @moveClick="moveClick"
-    @selectContainer="selectContainer"
-  >
+  <WidgetContainer size="large" v-bind="rest" v-on="emitHandlers">
     <slot></slot>
   </WidgetContainer>
 </template>

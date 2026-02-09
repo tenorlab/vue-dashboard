@@ -11,6 +11,7 @@ import type {
 } from '@tenorlab/dashboard-core'
 
 /**
+/**
  * @name IDashboardState
  * @description Interface defining the structure of the dashboard store state
  * @property {boolean} isLoading - Indicates if the dashboard is currently loading
@@ -53,9 +54,8 @@ const _state = reactive<IDashboardState>(getInitialState())
 const _mutations = {
   setIsLoading: (value: boolean) => (_state.isLoading = value),
   setIsEditing: (value: boolean) => (_state.isEditing = value),
-  setTargetContainerKey: (
-    value: TDashboardWidgetKey | undefined,
-  ): TDashboardWidgetKey | undefined => (_state.targetContainerKey = value),
+  setTargetContainerKey: (value: TDashboardWidgetKey | undefined): TDashboardWidgetKey | undefined =>
+    (_state.targetContainerKey = value),
   setAllDashboardConfigs: (value: IDashboardConfig[]) => (_state.allDashboardConfigs = value),
   setCurrentDashboardConfig: (value: IDashboardConfig): IDashboardConfig[] => {
     const updatedList = [
@@ -104,9 +104,7 @@ const _mutations = {
       ...params,
     })
     const allUpdatedDashboardConfigs = [
-      ..._state.allDashboardConfigs.filter(
-        (x) => x.dashboardId !== resp.updatedDashboardConfig.dashboardId,
-      ),
+      ..._state.allDashboardConfigs.filter((x) => x.dashboardId !== resp.updatedDashboardConfig.dashboardId),
       resp.updatedDashboardConfig,
     ]
     if (resp.success) {
@@ -123,15 +121,9 @@ const _mutations = {
     widgetKey: TDashboardWidgetKey,
     parentWidgetKey?: TDashboardWidgetKey,
   ): TRemoveWidgetResponse => {
-    const resp = dashboardStoreUtils.removeWidget(
-      _state.currentDashboardConfig,
-      widgetKey,
-      parentWidgetKey,
-    )
+    const resp = dashboardStoreUtils.removeWidget(_state.currentDashboardConfig, widgetKey, parentWidgetKey)
     const allUpdatedDashboardConfigs = [
-      ..._state.allDashboardConfigs.filter(
-        (x) => x.dashboardId !== resp.updatedDashboardConfig.dashboardId,
-      ),
+      ..._state.allDashboardConfigs.filter((x) => x.dashboardId !== resp.updatedDashboardConfig.dashboardId),
       resp.updatedDashboardConfig,
     ]
     if (resp.success) {
@@ -156,9 +148,7 @@ const _mutations = {
       parentWidgetKey,
     )
     const allUpdatedDashboardConfigs = [
-      ..._state.allDashboardConfigs.filter(
-        (x) => x.dashboardId !== resp.updatedDashboardConfig.dashboardId,
-      ),
+      ..._state.allDashboardConfigs.filter((x) => x.dashboardId !== resp.updatedDashboardConfig.dashboardId),
       resp.updatedDashboardConfig,
     ]
     if (resp.success) {
@@ -207,11 +197,8 @@ const _actions = {
   }) => _mutations.addWidget(params),
   removeWidget: (widgetKey: TDashboardWidgetKey, parentWidgetKey?: TDashboardWidgetKey) =>
     _mutations.removeWidget(widgetKey, parentWidgetKey),
-  moveWidget: (
-    direction: -1 | 1,
-    widgetKey: TDashboardWidgetKey,
-    parentWidgetKey?: TDashboardWidgetKey,
-  ) => _mutations.moveWidget(direction, widgetKey, parentWidgetKey),
+  moveWidget: (direction: -1 | 1, widgetKey: TDashboardWidgetKey, parentWidgetKey?: TDashboardWidgetKey) =>
+    _mutations.moveWidget(direction, widgetKey, parentWidgetKey),
 }
 
 /**

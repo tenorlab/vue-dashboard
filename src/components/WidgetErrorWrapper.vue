@@ -5,22 +5,13 @@ import { useWidgetEmits } from './use-widget-emits'
 import { computed } from 'vue'
 
 const props = defineProps<IDashboardWidgetProps>()
-const emits = defineEmits<TWidgetEmits>()
-const { removeClick: onRemoveClick, moveClick: onMoveClick } = useWidgetEmits(emits)
+const _emits = defineEmits<TWidgetEmits>()
+const emitHandlers = useWidgetEmits(_emits)
 const extraProps = computed<TWidgetErrorExtraProps>(() => props.extraProps)
 </script>
 
 <template>
-  <DashboardWidgetBase
-    :widgetKey="widgetKey"
-    title="Widget Error"
-    :parentWidgetKey="parentWidgetKey"
-    :index="index"
-    :maxIndex="maxIndex"
-    :isEditing="isEditing"
-    @removeClick="onRemoveClick"
-    @moveClick="onMoveClick"
-  >
+  <DashboardWidgetBase v-bind="props" v-on="emitHandlers" title="Widget Error">
     <div class="p-4 border border-dashed border-danger">
       <span class="font-bold">Failed to load "{{ widgetKey }}"</span>
       <div v-if="extraProps?.versionMismatch" class="flex flex-col">
@@ -32,9 +23,7 @@ const extraProps = computed<TWidgetErrorExtraProps>(() => props.extraProps)
         <div class="flex flex-col mt-3">
           <h5>Externals:</h5>
           <dl class="ml-2 flex flex-col text-xs">
-            <dd v-for="(dep, i) in extraProps?.externalDependencies" :key="`dep-${i}`">
-              - {{ dep }}
-            </dd>
+            <dd v-for="(dep, i) in extraProps?.externalDependencies" :key="`dep-${i}`">- {{ dep }}</dd>
           </dl>
         </div>
       </div>

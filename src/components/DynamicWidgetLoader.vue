@@ -1,19 +1,22 @@
 <script setup lang="ts">
 // file: src/dashboard-components/DynamicWidgetLoader.vue
 import { defineAsyncComponent, computed, shallowRef, watchEffect, markRaw } from 'vue'
+import WidgetErrorWrapper from './WidgetErrorWrapper.vue'
+import { SpinnerComponent } from './dashboard-primitives'
 import { useWidgetEmits } from './use-widget-emits'
 import { parseContainerTitle } from '@tenorlab/dashboard-core'
-import WidgetErrorWrapper from './WidgetErrorWrapper.vue'
-import type { IChildWidgetConfigEntry, TDashboardWidgetKey } from '@tenorlab/dashboard-core'
+import type {
+  IChildWidgetConfigEntry,
+  IWidgetSavedProps,
+  TDashboardWidgetKey,
+} from '@tenorlab/dashboard-core'
 import type {
   TDashboardWidgetCatalog,
   TWidgetEmits,
   IDynamicWidgetCatalogEntry,
   TWidgetErrorExtraProps,
 } from './interfaces'
-import { SpinnerComponent } from './dashboard-primitives'
 
-// Add this helper function at the top of your script setup or in a shared utils file
 const isVersionCompatible = (hostVer: string, widgetVer: string): boolean => {
   const clean = (v: string) => v.replace(/[^0-9.]/g, '')
   const h = clean(hostVer).split('.').map(Number)
@@ -31,6 +34,7 @@ type TDynamicWidgetLoaderProps<TExtraProps = any> = {
   parentWidgetKey?: TDashboardWidgetKey
   targetContainerKey?: TDashboardWidgetKey
   childWidgetsConfig?: IChildWidgetConfigEntry[]
+  savedProps?: IWidgetSavedProps[]
   widgetCatalog: TDashboardWidgetCatalog
   isEditing: boolean
   // for additional props passed to all widget from the dashboard through the DynamicWidgetLoader:
@@ -121,8 +125,6 @@ watchEffect(async () => {
   // CASE B: Dynamic Loader
   if (entry.loader) {
     try {
-      console.log('Loading widget', props.widgetKey, entry.meta)
-
       // 2. Load the Module
       if (entry.isRemote) {
         const mod = await entry.loader()
@@ -173,57 +175,24 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
   widgetEmits.selectContainer(containerKey)
 }
 
-/*
-  <Suspense>
-    <component
-      v-if="resolvedComponent"
-      :is="resolvedComponent"
-      :index="index"
-      :maxIndex="childWidgetEntries.length - 1"
-      :widgetKey="widgetKey"
-      :parentWidgetKey="parentWidgetKey"
-      :widgetCatalog="widgetCatalog"
-      :isEditing="isEditing"
-      :highlight="(isContainer && targetContainerKey === widgetKey) || false"
-      :title="(isContainer ? parsedContainerTitle : catalogEntry?.meta?.name) || false"
-      :extraProps="extraProps"
-      @removeClick="onRemoveClick"
-      @moveClick="onMoveClick"
-      @selectContainer="selectContainer"
-    >
-      <template v-if="isContainer">
-        <DynamicWidgetLoader
-          v-for="(entry, i) in childWidgetEntries"
-          :key="`${entry.widgetKey}_${i}`"
-          :index="i"
-          :maxIndex="childWidgetEntries.length - 1"
-          :widgetKey="entry.widgetKey"
-          :parentWidgetKey="entry.parentWidgetKey"
-          :widgetCatalog="widgetCatalog"
-          :isEditing="isEditing"
-          @removeClick="onRemoveClick"
-          @moveClick="onMoveClick"
-        />
-      </template>
-    </component>
+const onSavedPropsChanged = (value: IWidgetSavedProps) => {
+  widgetEmits.savedPropsChanged(value)
+}
 
-    <div v-else class="flex flex-col">
-      <span> Widget not found or loader failed: </span>
-      <span>
-        {{ catalogEntry?.meta?.name || catalogEntry?.title }}
-      </span>
-      <span>
-        {{ widgetKey }}
-      </span>
-    </div>
-    <template #fallback>
-      <!-- This fallback will be ignored if the defineAsyncComponent 
-        options (loadingComponent, delay, etc.) are used, 
-        unless you explicitly set suspensible: true -->
-      <div>Loading {{ catalogEntry?.meta?.name || catalogEntry?.title }}</div>
-    </template>
-  </Suspense>
-*/
+const getWidgetSavedProps = (
+  widgetKey: TDashboardWidgetKey,
+  parentWidgetKey: TDashboardWidgetKey | undefined,
+): IWidgetSavedProps | undefined => {
+  // console.log('getWidgetSavedProps', widgetKey, parentWidgetKey, props.savedProps)
+  if ((parentWidgetKey || '').trim().length > 0) {
+    return (props.savedProps || []).find(
+      (x) => x.parentWidgetKey === parentWidgetKey && x.widgetKey === widgetKey,
+    )
+  }
+  return (props.savedProps || []).find(
+    (x) => (x.parentWidgetKey || '').trim().length === 0 && x.widgetKey === widgetKey,
+  )
+}
 </script>
 
 <template>
@@ -239,13 +208,14 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
         :widgetCatalog="widgetCatalog"
         :isEditing="isEditing"
         :highlight="(isContainer && targetContainerKey === widgetKey) || false"
-        :title="
-          isContainer ? parsedContainerTitle : catalogEntry?.meta?.name || catalogEntry?.title
-        "
+        :title="isContainer ? parsedContainerTitle : catalogEntry?.meta?.name || catalogEntry?.title"
+        :meta="catalogEntry?.meta"
+        :widgetSavedProps="getWidgetSavedProps(widgetKey, parentWidgetKey)"
         :extraProps="effectiveExtraProps"
         @removeClick="onRemoveClick"
         @moveClick="onMoveClick"
         @selectContainer="selectContainer"
+        @savedPropsChanged="onSavedPropsChanged"
       >
         <template v-if="isContainer" #default>
           <DynamicWidgetLoader
@@ -257,9 +227,11 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
             :parentWidgetKey="entry.parentWidgetKey"
             :widgetCatalog="widgetCatalog"
             :isEditing="isEditing"
+            :savedProps="savedProps"
             :extraProps="extraProps"
             @removeClick="onRemoveClick"
             @moveClick="onMoveClick"
+            @savedPropsChanged="onSavedPropsChanged"
           />
         </template>
       </component>
@@ -270,16 +242,10 @@ const selectContainer = (containerKey: TDashboardWidgetKey) => {
     </template>
 
     <template #fallback>
-      <div
-        class="relative min-h-12 flex flex-col items-center justify-center bg-base-200 rounded-lg"
-      >
+      <div class="relative min-h-12 flex flex-col items-center justify-center bg-base-200 rounded-lg">
         <SpinnerComponent :title="`Loading ${catalogEntry?.title || 'Widget'}`" />
-        <div
-          class="animate-ping absolute h-24 w-24 rounded-full border-4 border-primary opacity-20"
-        ></div>
-        <div
-          class="animate-spin h-12 w-12 rounded-full border-4 border-primary border-t-transparent"
-        ></div>
+        <div class="animate-ping absolute h-24 w-24 rounded-full border-4 border-primary opacity-20"></div>
+        <div class="animate-spin h-12 w-12 rounded-full border-4 border-primary border-t-transparent"></div>
       </div>
     </template>
   </Suspense>

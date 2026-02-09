@@ -13,9 +13,7 @@ defineProps<TSvgIconProps>()
     stroke-width="2"
     stroke-linecap="round"
     stroke-linejoin="round"
-    :class="
-      `lucide lucide-monitor-smartphone-icon lucide-monitor-smartphone ${cssClass || ''}`.trim()
-    "
+    :class="`lucide lucide-monitor-smartphone-icon lucide-monitor-smartphone ${cssClass || ''}`.trim()"
   >
     <path d="M18 8V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h8" />
     <path d="M10 19v-3.96 3.15" />

@@ -1,6 +1,6 @@
 // @tenorlab/vue-dashboard
 // file: src/components/use-widget-emits.ts
-import type { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
+import type { IWidgetSavedProps, TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 import type { TWidgetEmits } from './interfaces'
 
 /**
@@ -11,12 +11,9 @@ import type { TWidgetEmits } from './interfaces'
  */
 export function useWidgetEmits(emits: TWidgetEmits): {
   removeClick: (widgetKey: TDashboardWidgetKey, parentWidgetKey?: TDashboardWidgetKey) => any
-  moveClick: (
-    direction: -1 | 1,
-    widgetKey: TDashboardWidgetKey,
-    parentWidgetKey?: TDashboardWidgetKey,
-  ) => any
+  moveClick: (direction: -1 | 1, widgetKey: TDashboardWidgetKey, parentWidgetKey?: TDashboardWidgetKey) => any
   selectContainer: (containerKey?: TDashboardWidgetKey) => any
+  savedPropsChanged: (value: IWidgetSavedProps) => any
 } {
   const removeClick = (widgetKey: TDashboardWidgetKey, parentWidgetKey?: TDashboardWidgetKey) => {
     emits('removeClick', widgetKey, parentWidgetKey)
@@ -34,9 +31,14 @@ export function useWidgetEmits(emits: TWidgetEmits): {
     emits('selectContainer', containerKey)
   }
 
+  const savedPropsChanged = (value: IWidgetSavedProps): any => {
+    emits('savedPropsChanged', value)
+  }
+
   return {
     removeClick,
     moveClick,
     selectContainer,
+    savedPropsChanged,
   }
 }
