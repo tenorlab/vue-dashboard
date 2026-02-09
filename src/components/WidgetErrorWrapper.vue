@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 import type { IDashboardWidgetProps, TWidgetEmits, TWidgetErrorExtraProps } from './interfaces'
 import DashboardWidgetBase from './DashboardWidgetBase.vue'
 import { useWidgetEmits } from './use-widget-emits'
@@ -13,7 +12,7 @@ const extraProps = computed<TWidgetErrorExtraProps>(() => props.extraProps)
 
 <template>
   <DashboardWidgetBase
-    :widgetKey="props.widgetKey"
+    :widgetKey="widgetKey"
     title="Widget Error"
     :parentWidgetKey="parentWidgetKey"
     :index="index"
