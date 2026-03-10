@@ -126,9 +126,9 @@ const onCollapseExpand = () => {
         >
           <HandGrabIcon class="size-5" />
         </div>
-        <div class="flex flex-row gap-2 items-center justify-between">
+        <div class="w-full flex flex-row gap-2 items-center justify-between">
           <slot name="title">
-            <h2 class="widget-title">{{ title }}</h2>
+            <h2 class="widget-title cursor-pointer" @click.stop="() => onCollapseExpand()">{{ title }}</h2>
           </slot>
           <slot name="title-right"></slot>
         </div>
