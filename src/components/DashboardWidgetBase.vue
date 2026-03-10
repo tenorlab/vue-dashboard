@@ -120,15 +120,16 @@ const onCollapseExpand = () => {
 <template>
   <div :class="rootCssClass">
     <div :class="widgetHeaderCssClass">
+
       <div class="widget-title-wrapper group w-full flex flex-row gap-2 items-center">
         <div
           class="drag-handle hidden cursor-pointer text-primary group-hover:flex hover:brightness-110 pointer-coarse:flex"
         >
           <HandGrabIcon class="size-5" />
         </div>
-        <div class="flex flex-row gap-2 items-center justify-between">
+        <div class="w-full flex flex-row gap-2 items-center justify-between">
           <slot name="title">
-            <h2 class="widget-title">{{ title }}</h2>
+            <h2 class="widget-title cursor-pointer" @click.stop="() => onCollapseExpand()">{{ title }}</h2>
           </slot>
           <slot name="title-right"></slot>
         </div>
