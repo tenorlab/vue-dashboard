@@ -120,7 +120,6 @@ const onCollapseExpand = () => {
 <template>
   <div :class="rootCssClass">
     <div :class="widgetHeaderCssClass">
-
       <div class="widget-title-wrapper group w-full flex flex-row gap-2 items-center">
         <div
           class="drag-handle hidden cursor-pointer text-primary group-hover:flex hover:brightness-110 pointer-coarse:flex"
