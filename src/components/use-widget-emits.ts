@@ -14,6 +14,12 @@ export function useWidgetEmits(emits: TWidgetEmits): {
   moveClick: (direction: -1 | 1, widgetKey: TDashboardWidgetKey, parentWidgetKey?: TDashboardWidgetKey) => any
   selectContainer: (containerKey?: TDashboardWidgetKey) => any
   savedPropsChanged: (value: IWidgetSavedProps) => any
+  headerActionClick: (
+    actionId: string,
+    widgetKey: TDashboardWidgetKey,
+    index: number,
+    parentWidgetKey?: TDashboardWidgetKey,
+  ) => any
 } {
   const removeClick = (widgetKey: TDashboardWidgetKey, parentWidgetKey?: TDashboardWidgetKey) => {
     emits('removeClick', widgetKey, parentWidgetKey)
@@ -35,10 +41,20 @@ export function useWidgetEmits(emits: TWidgetEmits): {
     emits('savedPropsChanged', value)
   }
 
+  const headerActionClick = (
+    actionId: string,
+    widgetKey: TDashboardWidgetKey,
+    index: number,
+    parentWidgetKey?: TDashboardWidgetKey,
+  ): any => {
+    emits('headerActionClick', actionId, widgetKey, index, parentWidgetKey)
+  }
+
   return {
     removeClick,
     moveClick,
     selectContainer,
     savedPropsChanged,
+    headerActionClick,
   }
 }

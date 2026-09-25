@@ -10,6 +10,7 @@ import type {
   TDashboardWidgetCatalogBase,
 } from '@tenorlab/dashboard-core'
 import type { Component as VueComponent } from 'vue'
+import type { IWidgetHeaderAction } from './vue-specific'
 
 // framework specific component type and element type
 /**
@@ -22,7 +23,7 @@ type TFrameworkComponentType = VueComponent
  * @name TFrameworkElementType
  * @description Represents a Vue component instance.
  */
-type TFrameworkElementType = VueComponent
+type TFrameworkElementType = unknown
 
 /**
  * @name TWidgetMetaInfo
@@ -44,7 +45,9 @@ export interface IDashboardGridProps extends IDashboardGridPropsBase {}
  * @template TExtraProps - Additional properties to be included in the widget props.
  * @interface IDashboardWidgetProps
  */
-export interface IDashboardWidgetProps<TExtraProps = any> extends IDashboardWidgetPropsBase<TExtraProps> {}
+export interface IDashboardWidgetProps<TExtraProps = any> extends IDashboardWidgetPropsBase<TExtraProps> {
+  widgetHeaderActions?: IWidgetHeaderAction[]
+}
 
 /**
  * @name IDashboardWidget

@@ -106,6 +106,12 @@ const selectContainer = () => {
     widgetEmits.selectContainer(props.widgetKey)
   }
 }
+
+const onHeaderActionClick = (actionId: string) => {
+  if (props.widgetKey) {
+    widgetEmits.headerActionClick(actionId, props.widgetKey, props.index, props.parentWidgetKey)
+  }
+}
 </script>
 
 <template>
@@ -122,6 +128,23 @@ const selectContainer = () => {
       <div data-testid="collapse-and-other-actions">
         <div class="actions-inner">
           <div class="actions-buttons-container">
+            <Button
+              v-for="action in props.widgetHeaderActions || []"
+              :key="action.id"
+              :data-testid="`widget-header-action_${action.id}_${props.widgetKey}_${props.index}`"
+              :isIconButton="true"
+              :disabled="action.disabled"
+              :tooltip="{ placement: 'top', title: action.tooltip || action.label }"
+              @click.stop="onHeaderActionClick(action.id)"
+            >
+              <component
+                v-if="action.icon"
+                :is="action.icon"
+                :class="action.iconClass || defaultActionIconSize"
+              />
+              <span v-else class="text-xs">{{ action.label }}</span>
+            </Button>
+
             <!-- Target this Container Button -->
             <Button
               :data-testid="`open-widgets-catalog-from-container_${props.title}`"

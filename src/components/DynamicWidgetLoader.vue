@@ -13,6 +13,7 @@ import type {
 import type {
   TDashboardWidgetCatalog,
   TWidgetEmits,
+  IWidgetHeaderAction,
   IDynamicWidgetCatalogEntry,
   TWidgetErrorExtraProps,
 } from './interfaces'
@@ -37,6 +38,7 @@ type TDynamicWidgetLoaderProps<TExtraProps = any> = {
   savedProps?: IWidgetSavedProps[]
   widgetCatalog: TDashboardWidgetCatalog
   isEditing: boolean
+  widgetHeaderActions?: IWidgetHeaderAction[]
   // for additional props passed to all widget from the dashboard through the DynamicWidgetLoader:
   extraProps?: TExtraProps
 }
@@ -179,6 +181,15 @@ const onSavedPropsChanged = (value: IWidgetSavedProps) => {
   widgetEmits.savedPropsChanged(value)
 }
 
+const onHeaderActionClick = (
+  actionId: string,
+  widgetKey: TDashboardWidgetKey,
+  index: number,
+  parentWidgetKey?: TDashboardWidgetKey,
+) => {
+  widgetEmits.headerActionClick(actionId, widgetKey, index, parentWidgetKey)
+}
+
 const getWidgetSavedProps = (
   widgetKey: TDashboardWidgetKey,
   parentWidgetKey: TDashboardWidgetKey | undefined,
@@ -210,12 +221,14 @@ const getWidgetSavedProps = (
         :highlight="(isContainer && targetContainerKey === widgetKey) || false"
         :title="isContainer ? parsedContainerTitle : catalogEntry?.meta?.name || catalogEntry?.title"
         :meta="catalogEntry?.meta"
+        :widgetHeaderActions="widgetHeaderActions"
         :widgetSavedProps="getWidgetSavedProps(widgetKey, parentWidgetKey)"
         :extraProps="effectiveExtraProps"
         @removeClick="onRemoveClick"
         @moveClick="onMoveClick"
         @selectContainer="selectContainer"
         @savedPropsChanged="onSavedPropsChanged"
+        @headerActionClick="onHeaderActionClick"
       >
         <template v-if="isContainer" #default>
           <DynamicWidgetLoader
@@ -227,11 +240,13 @@ const getWidgetSavedProps = (
             :parentWidgetKey="entry.parentWidgetKey"
             :widgetCatalog="widgetCatalog"
             :isEditing="isEditing"
+            :widgetHeaderActions="widgetHeaderActions"
             :savedProps="savedProps"
             :extraProps="extraProps"
             @removeClick="onRemoveClick"
             @moveClick="onMoveClick"
             @savedPropsChanged="onSavedPropsChanged"
+            @headerActionClick="onHeaderActionClick"
           />
         </template>
       </component>

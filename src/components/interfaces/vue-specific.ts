@@ -2,6 +2,15 @@
 // file: src/components/interfaces/vue-specific.ts
 import type { IWidgetSavedProps, TDashboardWidgetKey } from '@tenorlab/dashboard-core'
 
+export interface IWidgetHeaderAction {
+  id: string
+  label: string
+  tooltip?: string
+  icon?: unknown
+  iconClass?: string
+  disabled?: boolean
+}
+
 // vue specific
 /**
  * @name TWidgetEmits
@@ -18,4 +27,11 @@ export type TWidgetEmits = {
   ): void
   (event: 'selectContainer', containerKey?: TDashboardWidgetKey): void
   (event: 'savedPropsChanged', savedProps: IWidgetSavedProps): void
+  (
+    event: 'headerActionClick',
+    actionId: string,
+    widgetKey: TDashboardWidgetKey,
+    index: number,
+    parentWidgetKey?: TDashboardWidgetKey,
+  ): void
 }

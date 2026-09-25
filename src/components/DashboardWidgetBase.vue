@@ -114,6 +114,12 @@ const onCollapseExpand = () => {
   }
 }
 
+const onHeaderActionClick = (actionId: string) => {
+  if (props.widgetKey) {
+    emits('headerActionClick', actionId, props.widgetKey, props.index, props.parentWidgetKey)
+  }
+}
+
 // NOTE; not watching props.widgetSavedProps sine we are setting refIsCollapsed before we emit saved props changed.
 </script>
 
@@ -130,7 +136,28 @@ const onCollapseExpand = () => {
           <slot name="title">
             <h2 class="widget-title cursor-pointer" @click.stop="() => onCollapseExpand()">{{ title }}</h2>
           </slot>
-          <slot name="title-right"></slot>
+          <div class="flex items-center gap-1">
+            <slot name="title-right"></slot>
+            <Button
+              v-for="action in props.widgetHeaderActions || []"
+              :key="action.id"
+              :data-testid="`widget-header-action_${action.id}_${widgetKey}_${index}`"
+              :isIconButton="true"
+              :disabled="action.disabled"
+              :tooltip="{
+                placement: 'top',
+                title: action.tooltip || action.label,
+              }"
+              @click.stop="onHeaderActionClick(action.id)"
+            >
+              <component
+                v-if="action.icon"
+                :is="action.icon"
+                :class="action.iconClass || defaultActionIconSize"
+              />
+              <span v-else class="text-xs">{{ action.label }}</span>
+            </Button>
+          </div>
         </div>
       </div>
 
