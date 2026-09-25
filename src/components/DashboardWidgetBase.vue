@@ -3,8 +3,8 @@
 import { ref, computed } from 'vue'
 import {
   Button,
-  MoveLeftIcon,
-  MoveRightIcon,
+  // MoveLeftIcon,
+  // MoveRightIcon,
   XCircleIcon as RemoveWidgetIcon,
   ChevronDownIcon,
   HandGrabIcon,
@@ -93,11 +93,11 @@ const onRemoveClick = () => {
   }
 }
 
-const onMoveClick = (direction: -1 | 1) => {
-  if (props.widgetKey) {
-    emits('moveClick', direction, props.widgetKey, props.parentWidgetKey)
-  }
-}
+// const onMoveClick = (direction: -1 | 1) => {
+//   if (props.widgetKey) {
+//     emits('moveClick', direction, props.widgetKey, props.parentWidgetKey)
+//   }
+// }
 
 const emitSavedPropsChanged = () => {
   emits('savedPropsChanged', {
@@ -137,26 +137,30 @@ const onHeaderActionClick = (actionId: string) => {
             <h2 class="widget-title cursor-pointer" @click.stop="() => onCollapseExpand()">{{ title }}</h2>
           </slot>
           <div class="flex items-center gap-1">
-            <slot name="title-right"></slot>
-            <Button
-              v-for="action in props.widgetHeaderActions || []"
-              :key="action.id"
-              :data-testid="`widget-header-action_${action.id}_${widgetKey}_${index}`"
-              :isIconButton="true"
-              :disabled="action.disabled"
-              :tooltip="{
-                placement: 'top',
-                title: action.tooltip || action.label,
-              }"
-              @click.stop="onHeaderActionClick(action.id)"
-            >
-              <component
-                v-if="action.icon"
-                :is="action.icon"
-                :class="action.iconClass || defaultActionIconSize"
-              />
-              <span v-else class="text-xs">{{ action.label }}</span>
-            </Button>
+            <div v-if="!isEditing" class="widget-owned-title-actions flex items-center gap-1">
+              <slot name="title-right"></slot>
+            </div>
+            <div class="dashboard-owned-header-actions flex items-center gap-1">
+              <Button
+                v-for="action in props.widgetHeaderActions || []"
+                :key="action.id"
+                :data-testid="`widget-header-action_${action.id}_${widgetKey}_${index}`"
+                :isIconButton="true"
+                :disabled="action.disabled"
+                :tooltip="{
+                  placement: 'top',
+                  title: action.tooltip || action.label,
+                }"
+                @click.stop="onHeaderActionClick(action.id)"
+              >
+                <component
+                  v-if="action.icon"
+                  :is="action.icon"
+                  :class="action.iconClass || defaultActionIconSize"
+                />
+                <span v-else class="text-xs">{{ action.label }}</span>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -167,7 +171,7 @@ const onHeaderActionClick = (actionId: string) => {
             <span class="hidden">Widget</span>
           </div>
           <div class="actions-buttons-container">
-            <Button
+            <!-- <Button
               :data-testid="`move-widget-left_${widgetKey}_${index}`"
               :isIconButton="true"
               :disabled="index < 1"
@@ -178,9 +182,9 @@ const onHeaderActionClick = (actionId: string) => {
               @click.stop="onMoveClick(-1)"
             >
               <MoveLeftIcon :class="defaultActionIconSize" />
-            </Button>
+            </Button> -->
 
-            <Button
+            <!-- <Button
               :data-testid="`move-widget-right_${widgetKey}_${index}`"
               :isIconButton="true"
               :disabled="index >= maxIndex"
@@ -191,19 +195,7 @@ const onHeaderActionClick = (actionId: string) => {
               @click.stop="onMoveClick(1)"
             >
               <MoveRightIcon :class="defaultActionIconSize" />
-            </Button>
-
-            <Button
-              :data-testid="`remove-container_${title}`"
-              :isIconButton="true"
-              :tooltip="{
-                placement: 'top',
-                title: 'Remove Widget',
-              }"
-              @click.stop="onRemoveClick"
-            >
-              <RemoveWidgetIcon :class="defaultActionIconSize" />
-            </Button>
+            </Button> -->
 
             <Button
               v-if="!getNoCollapse()"
@@ -224,12 +216,28 @@ const onHeaderActionClick = (actionId: string) => {
                 }"
               />
             </Button>
+
+            <Button
+              :data-testid="`remove-container_${title}`"
+              :isIconButton="true"
+              :tooltip="{
+                placement: 'top',
+                title: 'Remove Widget',
+              }"
+              @click.stop="onRemoveClick"
+            >
+              <RemoveWidgetIcon :class="defaultActionIconSize" />
+            </Button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="widget-inner transition-height duration-300 ease-in-out" :data-collapsed="refIsCollapsed">
+    <div
+      class="widget-inner transition-height duration-300 ease-in-out"
+      :class="`${props.isEditing ? 'hidden' : ''}`"
+      :data-collapsed="refIsCollapsed"
+    >
       <slot></slot>
     </div>
   </div>

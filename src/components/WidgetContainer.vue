@@ -128,22 +128,24 @@ const onHeaderActionClick = (actionId: string) => {
       <div data-testid="collapse-and-other-actions">
         <div class="actions-inner">
           <div class="actions-buttons-container">
-            <Button
-              v-for="action in props.widgetHeaderActions || []"
-              :key="action.id"
-              :data-testid="`widget-header-action_${action.id}_${props.widgetKey}_${props.index}`"
-              :isIconButton="true"
-              :disabled="action.disabled"
-              :tooltip="{ placement: 'top', title: action.tooltip || action.label }"
-              @click.stop="onHeaderActionClick(action.id)"
-            >
-              <component
-                v-if="action.icon"
-                :is="action.icon"
-                :class="action.iconClass || defaultActionIconSize"
-              />
-              <span v-else class="text-xs">{{ action.label }}</span>
-            </Button>
+            <div class="dashboard-owned-header-actions flex items-center gap-1">
+              <Button
+                v-for="action in props.widgetHeaderActions || []"
+                :key="action.id"
+                :data-testid="`widget-header-action_${action.id}_${props.widgetKey}_${props.index}`"
+                :isIconButton="true"
+                :disabled="action.disabled"
+                :tooltip="{ placement: 'top', title: action.tooltip || action.label }"
+                @click.stop="onHeaderActionClick(action.id)"
+              >
+                <component
+                  v-if="action.icon"
+                  :is="action.icon"
+                  :class="action.iconClass || defaultActionIconSize"
+                />
+                <span v-else class="text-xs">{{ action.label }}</span>
+              </Button>
+            </div>
 
             <!-- Target this Container Button -->
             <Button
